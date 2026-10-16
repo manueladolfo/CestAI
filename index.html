@@ -122,26 +122,27 @@
   <!-- ==================== HEADER PRINCIPAL ==================== -->
   <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-sm">
     <div class="max-w-4xl mx-auto px-3.5 sm:px-6 py-2.5 sm:py-3.5">
-      <div class="flex items-center">
-        
-        <!-- Icono de la App -->
-        <div class="relative flex-shrink-0">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-brand-600/25 border border-emerald-300/30 transition-transform active:scale-95">
-            <i class="fa-solid fa-basket-shopping text-xl sm:text-2xl filter drop-shadow"></i>
+      <!-- Marca Unificada en el Centro Superior -->
+      <div class="flex items-center justify-center">
+        <div class="inline-flex items-center gap-3 py-1 px-4 rounded-2xl bg-slate-50/90 hover:bg-slate-100/90 border border-slate-200/80 shadow-xs transition-transform active:scale-98">
+          
+          <!-- Icono de la App -->
+          <div class="relative flex-shrink-0">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-brand-600/30 border border-emerald-300/40">
+              <i class="fa-solid fa-basket-shopping text-xl sm:text-2xl filter drop-shadow"></i>
+            </div>
+            <!-- Insignia de IA en la esquina del logo -->
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white text-brand-600 flex items-center justify-center text-[9px] shadow-sm border border-brand-100 font-bold">
+              <i class="fa-solid fa-wand-magic-sparkles text-[8px]"></i>
+            </span>
           </div>
-          <!-- Pequeña insignia de IA en la esquina del logo -->
-          <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white text-brand-600 flex items-center justify-center text-[9px] shadow-sm border border-brand-100 font-bold">
-            <i class="fa-solid fa-wand-magic-sparkles text-[8px]"></i>
-          </span>
-        </div>
 
-        <!-- Nombre de la App centrado en el espacio restante tras el icono -->
-        <div class="flex-1 flex items-center justify-center">
+          <!-- Nombre de la App Destacado -->
           <h1 class="brand-gradient font-black text-2xl sm:text-3xl tracking-tight leading-none drop-shadow-sm select-none">
             Cest<span class="text-teal-500 font-extrabold">AI</span>
           </h1>
-        </div>
 
+        </div>
       </div>
 
       <!-- Barra de Estado: Supermercado Activo y Estimación de Compra -->
@@ -621,11 +622,11 @@
           </select>
         </div>
 
-        <!-- Input de Precio Unitario -->
+        <!-- Input de Precio Unitario con teclado numérico garantizado -->
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Precio Unitario (€)</label>
           <div class="relative">
-            <input type="number" step="0.01" min="0" id="input-manual-price-value" required placeholder="0.00"
+            <input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" id="input-manual-price-value" required placeholder="0.00"
               class="w-full pl-3 pr-8 py-2.5 text-base font-extrabold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none">
             <span class="absolute inset-y-0 right-3.5 flex items-center text-slate-400 font-bold text-sm pointer-events-none">€</span>
           </div>
@@ -639,6 +640,69 @@
           <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-600/30 transition flex items-center gap-1.5">
             <i class="fa-solid fa-check"></i>
             <span>Guardar Precio</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL EDITAR CANTIDAD Y UNIDAD ==================== -->
+  <div id="modal-edit-quantity" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-sm shadow-sm">
+            <i class="fa-solid fa-calculator"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-800">Modificar cantidad</h3>
+            <p class="text-[11px] text-slate-500 truncate max-w-[200px]" id="edit-quantity-item-name">Producto</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEditQuantityModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-edit-quantity" class="space-y-3.5">
+        <input type="hidden" id="edit-quantity-item-id" value="">
+
+        <!-- Input de Cantidad con teclado numérico garantizado (inputmode="decimal") -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Cantidad</label>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-modal-qty-minus" class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-base flex items-center justify-center active:scale-95 transition">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <div class="relative flex-1">
+              <input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" id="input-edit-quantity-val" required
+                class="w-full text-center py-2.5 text-2xl font-black text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none">
+            </div>
+            <button type="button" id="btn-modal-qty-plus" class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-base flex items-center justify-center active:scale-95 transition">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de Unidad rápida -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Unidad de medida</label>
+          <div class="grid grid-cols-4 gap-1.5" id="unit-selector-chips">
+            <button type="button" data-unit="ud." class="btn-unit-chip py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition">ud.</button>
+            <button type="button" data-unit="kg" class="btn-unit-chip py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition">kg</button>
+            <button type="button" data-unit="g" class="btn-unit-chip py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition">g</button>
+            <button type="button" data-unit="pack" class="btn-unit-chip py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition">pack</button>
+          </div>
+          <input type="hidden" id="input-edit-quantity-unit" value="ud.">
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeEditQuantityModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition">
+            Cancelar
+          </button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-600/30 transition active:scale-98">
+            Guardar Cantidad
           </button>
         </div>
       </form>
@@ -1081,34 +1145,67 @@
     }
 
     function promptEditQuantity(itemId) {
+      openEditQuantityModal(itemId);
+    }
+
+    function openEditQuantityModal(itemId) {
       const item = state.items.find(i => i.id === itemId);
       if (!item) return;
 
-      const currentVal = `${item.quantity}${item.unit && item.unit !== 'ud.' ? ' ' + item.unit : ''}`;
-      const input = prompt(`Modificar cantidad para "${item.name}":\n(Ejemplos: 3, 2 kg, 500 g, 6 pack, 1.5)`, currentVal);
-      if (input !== null && input.trim() !== '') {
-        const text = input.trim();
-        const match = text.match(/^(\d+(?:[.,]\d+)?)\s*(kg|g|l|ml|pack|docena|unidades|uds|ud|latas|botellas|botes)?\s*$/i);
-        if (match) {
-          const qty = parseFloat(match[1].replace(',', '.'));
-          if (!isNaN(qty) && qty > 0) {
-            item.quantity = qty;
-            if (match[2]) item.unit = match[2].toLowerCase();
-            saveState();
-            renderShoppingList();
-            showToast(`Cantidad actualizada: ${item.quantity} ${item.unit || 'ud.'}`, 'success');
-            return;
-          }
+      const modal = document.getElementById('modal-edit-quantity');
+      document.getElementById('edit-quantity-item-id').value = item.id;
+      document.getElementById('edit-quantity-item-name').textContent = item.name;
+      document.getElementById('input-edit-quantity-val').value = item.quantity;
+      
+      const currentUnit = item.unit || 'ud.';
+      document.getElementById('input-edit-quantity-unit').value = currentUnit;
+      updateUnitChipsUI(currentUnit);
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        const inp = document.getElementById('input-edit-quantity-val');
+        if (inp) {
+          inp.focus();
+          inp.select();
         }
-        const numOnly = parseFloat(text.replace(',', '.'));
-        if (!isNaN(numOnly) && numOnly > 0) {
-          item.quantity = numOnly;
-          saveState();
-          renderShoppingList();
-          showToast(`Cantidad actualizada: ${item.quantity} ${item.unit || 'ud.'}`, 'success');
+      }, 150);
+    }
+
+    function closeEditQuantityModal() {
+      document.getElementById('modal-edit-quantity').classList.add('hidden');
+    }
+
+    function updateUnitChipsUI(selectedUnit) {
+      document.querySelectorAll('.btn-unit-chip').forEach(btn => {
+        if (btn.getAttribute('data-unit') === selectedUnit) {
+          btn.className = 'btn-unit-chip py-1.5 text-xs font-bold rounded-lg border-2 border-brand-500 bg-brand-50 text-brand-700 shadow-xs transition';
         } else {
-          showToast('Introduce un número válido (ej: 2 o 1.5 kg)', 'info');
+          btn.className = 'btn-unit-chip py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition';
         }
+      });
+    }
+
+    function handleSaveQuantity(e) {
+      if (e) e.preventDefault();
+      const itemId = document.getElementById('edit-quantity-item-id').value;
+      const rawVal = document.getElementById('input-edit-quantity-val').value.trim().replace(',', '.');
+      const qty = parseFloat(rawVal);
+      const unit = document.getElementById('input-edit-quantity-unit').value || 'ud.';
+
+      if (isNaN(qty) || qty <= 0) {
+        showToast('Introduce una cantidad válida mayor que 0', 'warning');
+        return;
+      }
+
+      const item = state.items.find(i => i.id === itemId);
+      if (item) {
+        item.quantity = qty;
+        item.unit = unit;
+        saveState();
+        renderShoppingList();
+        updateEstimatedTotal();
+        closeEditQuantityModal();
+        showToast(`Cantidad actualizada: ${item.quantity} ${item.unit}`, 'success');
       }
     }
 
@@ -2105,7 +2202,8 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
       if (e) e.preventDefault();
       const idInput = document.getElementById('edit-price-item-id').value;
       const selectSuper = document.getElementById('edit-price-supermarket').value;
-      const priceVal = parseFloat(document.getElementById('input-manual-price-value').value);
+      const rawPrice = (document.getElementById('input-manual-price-value').value || '').trim().replace(',', '.');
+      const priceVal = parseFloat(rawPrice);
 
       if (isNaN(priceVal) || priceVal <= 0) {
         showToast('Introduce un precio válido mayor a 0', 'warning');
@@ -2363,6 +2461,27 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
 
       // Formulario Editar / Guardar Precio Manual
       document.getElementById('form-edit-price').addEventListener('submit', handleSaveManualPrice);
+
+      // Formulario Editar / Guardar Cantidad Manual
+      document.getElementById('form-edit-quantity')?.addEventListener('submit', handleSaveQuantity);
+      document.getElementById('btn-modal-qty-minus')?.addEventListener('click', () => {
+        const inp = document.getElementById('input-edit-quantity-val');
+        const val = parseFloat(inp.value.replace(',', '.')) || 1;
+        const next = Math.max(0.5, Math.round((val - 1) * 10) / 10);
+        inp.value = next;
+      });
+      document.getElementById('btn-modal-qty-plus')?.addEventListener('click', () => {
+        const inp = document.getElementById('input-edit-quantity-val');
+        const val = parseFloat(inp.value.replace(',', '.')) || 1;
+        inp.value = Math.round((val + 1) * 10) / 10;
+      });
+      document.querySelectorAll('.btn-unit-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const unit = btn.getAttribute('data-unit');
+          document.getElementById('input-edit-quantity-unit').value = unit;
+          updateUnitChipsUI(unit);
+        });
+      });
 
       // Añadir Supermercado Modal
       document.getElementById('btn-add-supermarket').addEventListener('click', openAddSupermarketModal);
