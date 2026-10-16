@@ -122,66 +122,26 @@
   <!-- ==================== HEADER PRINCIPAL ==================== -->
   <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-sm">
     <div class="max-w-4xl mx-auto px-3.5 sm:px-6 py-2.5 sm:py-3.5">
-      <div class="flex items-center justify-between gap-2.5">
+      <div class="flex items-center">
         
-        <!-- Logo Grande y Nombre con Diseño Guay (Gradiente no negro) -->
-        <div class="flex items-center gap-3">
-          <!-- Icono de la App Notablemente Más Grande con Sombra Glow & Sparkle -->
-          <div class="relative flex-shrink-0">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-brand-600/30 border border-emerald-300/30 transition-transform active:scale-95">
-              <i class="fa-solid fa-basket-shopping text-2xl sm:text-3xl filter drop-shadow"></i>
-            </div>
-            <!-- Pequeña insignia de IA brillante en la esquina del logo -->
-            <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white text-brand-600 flex items-center justify-center text-[10px] shadow-sm border border-brand-100 font-bold">
-              <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i>
-            </span>
+        <!-- Icono de la App -->
+        <div class="relative flex-shrink-0">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-brand-600/25 border border-emerald-300/30 transition-transform active:scale-95">
+            <i class="fa-solid fa-basket-shopping text-xl sm:text-2xl filter drop-shadow"></i>
           </div>
-
-          <!-- Nombre con Tipografía Gradiente Vibrante y Badge Pulsante -->
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <h1 class="brand-gradient font-black text-xl sm:text-2xl tracking-tight leading-none drop-shadow-sm">
-                Cest<span class="text-teal-500 font-extrabold">AI</span>
-              </h1>
-              <span class="relative inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-black bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-sm shadow-emerald-500/25">
-                SMART
-                <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-300"></span>
-                </span>
-              </span>
-            </div>
-            <p class="text-[11px] sm:text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-0.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-              <span>Tu cesta inteligente con IA</span>
-            </p>
-          </div>
+          <!-- Pequeña insignia de IA en la esquina del logo -->
+          <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white text-brand-600 flex items-center justify-center text-[9px] shadow-sm border border-brand-100 font-bold">
+            <i class="fa-solid fa-wand-magic-sparkles text-[8px]"></i>
+          </span>
         </div>
 
-        <!-- Acciones Cabecera: Precios, OCR, Configuración -->
-        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-          
-          <!-- Botón Historial de Precios -->
-          <button id="btn-open-history" title="Historial y Comparativa de Precios"
-            class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition active:scale-95 text-sm sm:text-base border border-slate-200/60">
-            <i class="fa-solid fa-chart-line"></i>
-          </button>
-
-          <!-- Botón Escanear Ticket (OCR) -->
-          <button id="btn-open-ocr" title="Escanear Ticket con IA"
-            class="px-3 sm:px-3.5 h-10 rounded-xl bg-gradient-to-r from-brand-600 via-teal-600 to-emerald-600 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-sm shadow-brand-600/30 hover:brightness-105 active:scale-95 transition border border-emerald-400/30">
-            <i class="fa-solid fa-camera"></i>
-            <span class="hidden md:inline">Escanear Ticket</span>
-          </button>
-
-          <!-- Botón Configuración (API Key) -->
-          <button id="btn-open-config" title="Configurar API Key de IA"
-            class="relative w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition active:scale-95 text-sm sm:text-base border border-slate-200/60">
-            <i class="fa-solid fa-gear"></i>
-            <!-- Indicador si falta API Key -->
-            <span id="api-key-badge" class="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-white hidden"></span>
-          </button>
+        <!-- Nombre de la App centrado en el espacio restante tras el icono -->
+        <div class="flex-1 flex items-center justify-center">
+          <h1 class="brand-gradient font-black text-2xl sm:text-3xl tracking-tight leading-none drop-shadow-sm select-none">
+            Cest<span class="text-teal-500 font-extrabold">AI</span>
+          </h1>
         </div>
+
       </div>
 
       <!-- Barra de Estado: Supermercado Activo y Estimación de Compra -->
@@ -327,31 +287,33 @@
 
   </main>
 
-  <!-- ==================== BARRA FLOTANTE MÓVIL (ERGONOMÍA IPHONE / ANDROID) ==================== -->
-  <div class="sm:hidden fixed bottom-3 inset-x-3 z-30 pointer-events-none">
+  <!-- ==================== BARRA FLOTANTE (MENÚ INFERIOR ÚNICO) ==================== -->
+  <div class="fixed bottom-3 inset-x-3 max-w-md mx-auto z-30 pointer-events-none">
     <div class="pointer-events-auto bg-white/95 backdrop-blur-lg border border-slate-200/90 shadow-2xl rounded-2xl px-4 py-2 flex items-center justify-around gap-2 text-slate-600">
       
       <!-- Botón Inicio / Ir a Input -->
-      <button type="button" onclick="focusAddInput()" class="flex flex-col items-center gap-0.5 text-brand-600 p-1 active:scale-95 transition">
+      <button type="button" onclick="focusAddInput()" class="flex flex-col items-center gap-0.5 text-brand-600 p-1 active:scale-95 transition" title="Añadir producto">
         <i class="fa-solid fa-plus-circle text-lg"></i>
         <span class="text-[10px] font-bold">Añadir</span>
       </button>
 
       <!-- Botón Escáner de Tickets en el centro destacado -->
-      <button type="button" onclick="openOcrModal()" class="flex flex-col items-center gap-0.5 -mt-5 bg-gradient-to-tr from-brand-600 via-teal-600 to-emerald-500 text-white w-12 h-12 rounded-2xl shadow-lg shadow-brand-500/35 border-2 border-white flex items-center justify-center active:scale-95 transition">
+      <button type="button" id="btn-open-ocr" onclick="openOcrModal()" class="flex flex-col items-center gap-0.5 -mt-5 bg-gradient-to-tr from-brand-600 via-teal-600 to-emerald-500 text-white w-12 h-12 rounded-2xl shadow-lg shadow-brand-500/35 border-2 border-white flex items-center justify-center active:scale-95 transition" title="Escanear Ticket con IA">
         <i class="fa-solid fa-camera text-lg"></i>
       </button>
 
       <!-- Botón Historial de Precios -->
-      <button type="button" onclick="openHistoryModal()" class="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 p-1 active:scale-95 transition">
+      <button type="button" id="btn-open-history" onclick="openHistoryModal()" class="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 p-1 active:scale-95 transition" title="Historial y Comparativa de Precios">
         <i class="fa-solid fa-chart-line text-lg"></i>
         <span class="text-[10px] font-semibold">Precios</span>
       </button>
 
       <!-- Botón Ajustes -->
-      <button type="button" onclick="openConfigModal()" class="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 p-1 active:scale-95 transition">
+      <button type="button" id="btn-open-config" onclick="openConfigModal()" class="relative flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 p-1 active:scale-95 transition" title="Configurar API Key de IA">
         <i class="fa-solid fa-gear text-lg"></i>
         <span class="text-[10px] font-semibold">Ajustes</span>
+        <!-- Indicador si falta API Key -->
+        <span id="api-key-badge" class="absolute -top-0.5 right-1 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 border-white hidden"></span>
       </button>
     </div>
   </div>
@@ -437,6 +399,21 @@
             <i class="fa-solid fa-plug"></i> Probar Conexión
           </button>
           <div id="test-connection-result" class="hidden mt-2 p-2 rounded-lg text-xs font-medium text-center"></div>
+        </div>
+
+        <!-- Memoria de Categorías Personalizadas -->
+        <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <i class="fa-solid fa-brain text-brand-600"></i> Memoria de Categorías
+            </p>
+            <p id="learned-categories-count" class="text-[10px] text-slate-500">0 productos memorizados</p>
+          </div>
+          <button type="button" id="btn-reset-learned-categories" 
+            class="px-2.5 py-1 text-[11px] font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 rounded-lg transition active:scale-95"
+            title="Borrar memoria de categorías aprendidas">
+            <i class="fa-solid fa-rotate-left mr-1"></i> Restablecer
+          </button>
         </div>
 
         <!-- Botones de Acción -->
@@ -748,6 +725,7 @@
       pricesHistory: [],
       activeSupermarketId: 'mercadona',
       collapsedCategories: {}, // guarda qué categorías están plegadas
+      customCategories: {},    // guarda asociaciones aprendidas { 'nombre_ingrediente': 'cat_id' }
       config: {
         aiProvider: 'gemini',
         apiKey: '',
@@ -796,6 +774,13 @@
         if (storedCollapsed) {
           state.collapsedCategories = JSON.parse(storedCollapsed);
         }
+
+        const storedCustomCats = localStorage.getItem('tucompra_custom_categories');
+        if (storedCustomCats) {
+          state.customCategories = JSON.parse(storedCustomCats);
+        } else {
+          state.customCategories = {};
+        }
       } catch (err) {
         console.error('Error al cargar del localStorage:', err);
         showToast('Error cargando los datos guardados', 'error');
@@ -810,6 +795,7 @@
         localStorage.setItem('tucompra_active_supermarket', state.activeSupermarketId);
         localStorage.setItem('tucompra_config', JSON.stringify(state.config));
         localStorage.setItem('tucompra_collapsed_cats', JSON.stringify(state.collapsedCategories));
+        localStorage.setItem('tucompra_custom_categories', JSON.stringify(state.customCategories || {}));
       } catch (err) {
         console.error('Error al guardar en localStorage:', err);
       }
@@ -817,6 +803,7 @@
 
     function checkApiKeyBadge() {
       const badge = document.getElementById('api-key-badge');
+      if (!badge) return;
       if (!state.config.apiKey) {
         badge.classList.remove('hidden');
       } else {
@@ -994,8 +981,24 @@
                 </span>
                 ${item.isAiClassified ? `<span title="Clasificado por IA" class="text-[9px] px-1.5 py-0.2 rounded bg-brand-50 text-brand-700 font-bold border border-brand-200">IA</span>` : ''}
               </div>
-              <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5 flex-wrap">
-                <span class="font-medium text-slate-500">${item.quantity} ${item.unit || 'ud.'}</span>
+              <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-1 flex-wrap">
+                <!-- Selector / Ajuste Rápido de Cantidad (+ / - / toque para escribir) -->
+                <div class="inline-flex items-center bg-slate-100 hover:bg-slate-200/70 rounded-lg p-0.5 text-xs text-slate-700 transition border border-slate-200/60 font-semibold shadow-xs">
+                  <button type="button" onclick="event.stopPropagation(); changeItemQuantity('${item.id}', -1)" 
+                    title="Restar 1" class="w-5 h-5 flex items-center justify-center rounded-md hover:bg-white text-slate-500 hover:text-slate-900 active:scale-90 transition">
+                    <i class="fa-solid fa-minus text-[9px]"></i>
+                  </button>
+                  <button type="button" onclick="event.stopPropagation(); promptEditQuantity('${item.id}')" 
+                    title="Toca para modificar cantidad exacta o unidad" 
+                    class="px-1.5 py-0.5 text-center text-slate-700 hover:text-brand-700 font-bold transition">
+                    ${item.quantity} <span class="text-[10px] text-slate-500 font-normal">${escapeHtml(item.unit || 'ud.')}</span>
+                  </button>
+                  <button type="button" onclick="event.stopPropagation(); changeItemQuantity('${item.id}', 1)" 
+                    title="Sumar 1" class="w-5 h-5 flex items-center justify-center rounded-md hover:bg-white text-slate-500 hover:text-slate-900 active:scale-90 transition">
+                    <i class="fa-solid fa-plus text-[9px]"></i>
+                  </button>
+                </div>
+
                 <span>•</span>
                 <!-- Badge de Precio Interactivo (Tap para editar manualmente) -->
                 <button type="button" onclick="event.stopPropagation(); openEditPriceModal('${item.id}')"
@@ -1061,6 +1064,54 @@
       renderShoppingList();
     }
 
+    function changeItemQuantity(itemId, delta) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      const current = parseFloat(item.quantity) || 1;
+      const newQty = Math.round((current + delta) * 100) / 100;
+      if (newQty <= 0) {
+        if (confirm(`¿Deseas eliminar "${item.name}" de la lista?`)) {
+          deleteItem(itemId);
+        }
+        return;
+      }
+      item.quantity = newQty;
+      saveState();
+      renderShoppingList();
+    }
+
+    function promptEditQuantity(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const currentVal = `${item.quantity}${item.unit && item.unit !== 'ud.' ? ' ' + item.unit : ''}`;
+      const input = prompt(`Modificar cantidad para "${item.name}":\n(Ejemplos: 3, 2 kg, 500 g, 6 pack, 1.5)`, currentVal);
+      if (input !== null && input.trim() !== '') {
+        const text = input.trim();
+        const match = text.match(/^(\d+(?:[.,]\d+)?)\s*(kg|g|l|ml|pack|docena|unidades|uds|ud|latas|botellas|botes)?\s*$/i);
+        if (match) {
+          const qty = parseFloat(match[1].replace(',', '.'));
+          if (!isNaN(qty) && qty > 0) {
+            item.quantity = qty;
+            if (match[2]) item.unit = match[2].toLowerCase();
+            saveState();
+            renderShoppingList();
+            showToast(`Cantidad actualizada: ${item.quantity} ${item.unit || 'ud.'}`, 'success');
+            return;
+          }
+        }
+        const numOnly = parseFloat(text.replace(',', '.'));
+        if (!isNaN(numOnly) && numOnly > 0) {
+          item.quantity = numOnly;
+          saveState();
+          renderShoppingList();
+          showToast(`Cantidad actualizada: ${item.quantity} ${item.unit || 'ud.'}`, 'success');
+        } else {
+          showToast('Introduce un número válido (ej: 2 o 1.5 kg)', 'info');
+        }
+      }
+    }
+
     function promptChangeCategory(itemId) {
       const item = state.items.find(i => i.id === itemId);
       if (!item) return;
@@ -1070,17 +1121,52 @@
       if (input) {
         const choice = parseInt(input.trim()) - 1;
         if (choice >= 0 && choice < CATEGORIES.length) {
-          item.category = CATEGORIES[choice].id;
+          const selectedCat = CATEGORIES[choice];
+          item.category = selectedCat.id;
           item.isAiClassified = false;
+
+          // Guardar en la memoria persistente aprendida
+          if (!state.customCategories) state.customCategories = {};
+          const key = normalizeText(item.name);
+          if (key) {
+            state.customCategories[key] = selectedCat.id;
+          }
+
           saveState();
           renderShoppingList();
-          showToast(`Categoría cambiada a ${CATEGORIES[choice].name}`, 'success');
+          showToast(`Categoría "${selectedCat.name}" memorizada para "${item.name}"`, 'success');
         }
       }
     }
 
-    // --- 10. CLASIFICACIÓN DE PRODUCTOS (IA CON FALLBACK HEURÍSTICO) ---
+    // --- 10. CLASIFICACIÓN DE PRODUCTOS Y MEMORIA APRENDIDA ---
+    function getLearnedCategory(text) {
+      if (!state.customCategories || typeof state.customCategories !== 'object') return null;
+      const clean = normalizeText(text);
+      if (!clean) return null;
+
+      // 1. Coincidencia exacta
+      if (state.customCategories[clean]) {
+        return state.customCategories[clean];
+      }
+
+      // 2. Coincidencia inteligente por palabra o frase clave
+      for (const [savedKey, catId] of Object.entries(state.customCategories)) {
+        if (!savedKey || savedKey.length < 3) continue;
+        const regex = new RegExp(`(^|\\s)${savedKey}(\\s|$)`, 'i');
+        if (regex.test(clean) || clean === savedKey) {
+          return catId;
+        }
+      }
+      return null;
+    }
+
     function classifyItemOffline(text) {
+      // Prioridad 1: memoria aprendida por el usuario
+      const learned = getLearnedCategory(text);
+      if (learned) return learned;
+
+      // Prioridad 2: heurística offline predeterminada
       const lower = normalizeText(text);
       for (const [catId, keywords] of Object.entries(OFFLINE_RULES)) {
         for (const kw of keywords) {
@@ -1093,6 +1179,12 @@
     }
 
     async function classifyItemWithAI(itemName) {
+      // Prioridad absoluta: si el usuario ya memorizó la categoría para este ítem
+      const learned = getLearnedCategory(itemName);
+      if (learned) {
+        return { category: learned, isAi: false, isLearned: true };
+      }
+
       // Si no hay API key configurada, usamos el motor heurístico local
       if (!state.config.apiKey) {
         return { category: classifyItemOffline(itemName), isAi: false };
@@ -1199,8 +1291,9 @@ Responde ÚNICAMENTE un objeto JSON válido con el formato: {"category": "id_de_
       const manualQty = parseInt(qtyInput.value) || 1;
       const finalQty = parsed.quantity > 1 ? parsed.quantity : manualQty;
 
-      // Asignar categoría inicial offline para feedback ultra-rápido
-      const initialCat = classifyItemOffline(parsed.name);
+      // Asignar categoría: prioridad absoluta si ya fue memorizada por el usuario
+      const learnedCat = getLearnedCategory(parsed.name);
+      const initialCat = learnedCat || classifyItemOffline(parsed.name);
       
       const newItem = {
         id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
@@ -1209,7 +1302,7 @@ Responde ÚNICAMENTE un objeto JSON válido con el formato: {"category": "id_de_
         quantity: finalQty,
         unit: parsed.unit,
         checked: false,
-        isAiClassified: false,
+        isAiClassified: !learnedCat,
         addedAt: new Date().toISOString()
       };
 
@@ -1221,8 +1314,8 @@ Responde ÚNICAMENTE un objeto JSON válido con el formato: {"category": "id_de_
       qtyInput.value = '1';
       document.getElementById('btn-clear-input').classList.add('hidden');
 
-      // Si hay API key, refinar en segundo plano con la IA
-      if (state.config.apiKey) {
+      // Si el usuario ya enseñó la categoría para este ítem, respetamos su memoria sin llamar a la IA
+      if (state.config.apiKey && !learnedCat) {
         classifyItemWithAI(newItem.name).then(result => {
           if (result.category && result.category !== newItem.category) {
             newItem.category = result.category;
@@ -1780,6 +1873,14 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
       }
       updateModelOptions(state.config.aiProvider);
       document.getElementById('test-connection-result').classList.add('hidden');
+
+      // Actualizar contador de memoria de categorías
+      const count = Object.keys(state.customCategories || {}).length;
+      const countElem = document.getElementById('learned-categories-count');
+      if (countElem) {
+        countElem.textContent = `${count} producto${count === 1 ? '' : 's'} memorizado${count === 1 ? '' : 's'}`;
+      }
+
       modal.classList.remove('hidden');
     }
 
@@ -2213,6 +2314,22 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
 
       // Test de conexión con LLM
       document.getElementById('btn-test-connection').addEventListener('click', testAiConnection);
+
+      // Restablecer memoria de categorías aprendidas
+      document.getElementById('btn-reset-learned-categories').addEventListener('click', () => {
+        const count = Object.keys(state.customCategories || {}).length;
+        if (count === 0) {
+          showToast('No hay productos en la memoria todavía.', 'info');
+          return;
+        }
+        if (confirm(`¿Seguro que deseas borrar las ${count} preferencias aprendidas? La app volverá a clasificar según el criterio automático inicial.`)) {
+          state.customCategories = {};
+          saveState();
+          const countElem = document.getElementById('learned-categories-count');
+          if (countElem) countElem.textContent = '0 productos memorizados';
+          showToast('Memoria de categorías restablecida con éxito', 'success');
+        }
+      });
 
       // OCR Modal
       document.getElementById('btn-open-ocr').addEventListener('click', openOcrModal);
