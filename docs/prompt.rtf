@@ -1,0 +1,50 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2907
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 # Contexto y Objetivo\
+Eres un desarrollador Frontend Experto. Tu objetivo es crear una WebApp completa (PWA) para la gesti\'f3n inteligente de listas de la compra, contenida enteramente en un \'fanico archivo `index.html`. Debe tener una interfaz minimalista, colores limpios (estilo Apple/Material) y funcionar perfectamente en m\'f3vil, tablet y escritorio.\
+\
+# Stack Tecnol\'f3gico Requerido\
+- Arquitectura: Single File Application (`index.html`).\
+- Estilos: Tailwind CSS (cargado v\'eda CDN).\
+- Iconos: FontAwesome o Heroicons (cargados v\'eda CDN).\
+- L\'f3gica y Estado: Vanilla JavaScript (ES6+).\
+- Persistencia: `localStorage` exclusivo.\
+- IA: Peticiones `fetch` directas desde el cliente a la API de LLM/Vision (Gemini o OpenAI).\
+\
+# Requisito Cr\'edtico de Seguridad (API Key)\
+Como no hay backend, NO hardcodees ninguna API Key en el c\'f3digo. Crea una vista o modal de "Configuraci\'f3n" donde el usuario deba introducir su API Key de IA. Guarda esta clave en el `localStorage` y \'fasala en las cabeceras (headers) de las peticiones `fetch` para categorizar productos o leer tickets.\
+\
+# Funcionalidades Core\
+1. **Lista Agn\'f3stica y Categorizaci\'f3n por IA:**\
+   - Input para a\'f1adir ingredientes.\
+   - Funci\'f3n JS que llame a la API del LLM usando la API Key del usuario para clasificar el \'edtem (Frutas, Verduras, Droguer\'eda, etc.).\
+   - Renderizado din\'e1mico que agrupe los elementos por categor\'eda.\
+\
+2. **M\'f3dulo OCR de Tickets:**\
+   - Input tipo `file` para capturar foto/subir imagen.\
+   - Conversi\'f3n de la imagen a Base64 y env\'edo a la API Vision del LLM.\
+   - Extracci\'f3n de: Supermercado, Fecha, Art\'edculos y Precios.\
+   - L\'f3gica de "Fuzzy Matching" en JavaScript para cruzar y actualizar los productos escaneados con los gen\'e9ricos de la lista.\
+\
+3. **Gesti\'f3n de Precios e Historial:**\
+   - Selector en la cabecera del "Supermercado Activo".\
+   - Estructura de datos en `localStorage` con arrays para: `items`, `supermarkets` y `pricesHistory`.\
+   - C\'e1lculo autom\'e1tico del "Total Estimado" en base al supermercado seleccionado y los precios hist\'f3ricos almacenados.\
+   - Botones para Importar/Exportar la base de datos completa (en formato JSON) para hacer copias de seguridad.\
+\
+# Reglas de UI/UX\
+- Usa un dise\'f1o Mobile-First.\
+- Componentes: Tarjetas redondeadas, categor\'edas tipo acorde\'f3n (colapsables).\
+- Interacci\'f3n: Checkboxes grandes para facilitar el uso con un solo dedo en el m\'f3vil.\
+- Feedback: A\'f1ade *spinners* o estados de carga (loading) mientras la IA procesa la categorizaci\'f3n o la foto del ticket.\
+\
+# Primer Paso de Ejecuci\'f3n\
+1. Genera la estructura completa del documento HTML5 con los CDN de Tailwind.\
+2. Crea el esqueleto de la UI (Cabecera, Selector de Supermercados, Lista, Input de nuevos \'edtems y Modal de Configuraci\'f3n).\
+3. A\'f1ade el bloque `<script>` con las variables de estado y la l\'f3gica de inicializaci\'f3n del `localStorage`.\
+}

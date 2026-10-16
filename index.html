@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50 text-slate-800 antialiased">
+<head>
+  <meta charset="UTF-8">
+  <!-- Meta PWA & Responsive Viewport con safe-area para iPhone y Android -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CestAI - Tu Cesta Inteligente con IA</title>
+  
+  <meta name="theme-color" content="#059669">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CestAI">
+  <meta name="description" content="CestAI - Gestión inteligente de listas de la compra con categorización por IA y escáner de tickets OCR">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans / Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          },
+          boxShadow: {
+            'apple': '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
+            'apple-hover': '0 8px 30px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03)',
+            'float': '0 20px 40px -10px rgba(16, 185, 129, 0.25)',
+            'glow': '0 0 20px rgba(16, 185, 129, 0.35)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    /* Soporte Safe Area Notch / Dynamic Island iPhone */
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+      --sar: env(safe-area-inset-right, 0px);
+    }
+    body {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      padding-top: var(--sat);
+      padding-bottom: var(--sab);
+      padding-left: var(--sal);
+      padding-right: var(--sar);
+    }
+    input, textarea, select {
+      user-select: text;
+    }
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .checkbox-custom {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .checkbox-custom:active {
+      transform: scale(0.9);
+    }
+    /* Gradiente animado para el logo y nombre */
+    .brand-gradient {
+      background: linear-gradient(135deg, #059669 0%, #0d9488 45%, #0284c7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-slate-50 text-slate-800">
+
+  <!-- ==================== HEADER PRINCIPAL ==================== -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-sm">
+    <div class="max-w-4xl mx-auto px-3.5 sm:px-6 py-2.5 sm:py-3.5">
+      <div class="flex items-center justify-between gap-2.5">
+        
+        <!-- Logo Grande y Nombre con Diseño Guay (Gradiente no negro) -->
+        <div class="flex items-center gap-3">
+          <!-- Icono de la App Notablemente Más Grande con Sombra Glow & Sparkle -->
+          <div class="relative flex-shrink-0">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-brand-600/30 border border-emerald-300/30 transition-transform active:scale-95">
+              <i class="fa-solid fa-basket-shopping text-2xl sm:text-3xl filter drop-shadow"></i>
+            </div>
+            <!-- Pequeña insignia de IA brillante en la esquina del logo -->
+            <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white text-brand-600 flex items-center justify-center text-[10px] shadow-sm border border-brand-100 font-bold">
+              <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i>
+            </span>
+          </div>
+
+          <!-- Nombre con Tipografía Gradiente Vibrante y Badge Pulsante -->
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h1 class="brand-gradient font-black text-xl sm:text-2xl tracking-tight leading-none drop-shadow-sm">
+                Cest<span class="text-teal-500 font-extrabold">AI</span>
+              </h1>
+              <span class="relative inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-black bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-sm shadow-emerald-500/25">
+                SMART
+                <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-300"></span>
+                </span>
+              </span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+              <span>Tu cesta inteligente con IA</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Acciones Cabecera: Precios, OCR, Configuración -->
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          
+          <!-- Botón Historial de Precios -->
+          <button id="btn-open-history" title="Historial y Comparativa de Precios"
+            class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition active:scale-95 text-sm sm:text-base border border-slate-200/60">
+            <i class="fa-solid fa-chart-line"></i>
+          </button>
+
+          <!-- Botón Escanear Ticket (OCR) -->
+          <button id="btn-open-ocr" title="Escanear Ticket con IA"
+            class="px-3 sm:px-3.5 h-10 rounded-xl bg-gradient-to-r from-brand-600 via-teal-600 to-emerald-600 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-sm shadow-brand-600/30 hover:brightness-105 active:scale-95 transition border border-emerald-400/30">
+            <i class="fa-solid fa-camera"></i>
+            <span class="hidden md:inline">Escanear Ticket</span>
+          </button>
+
+          <!-- Botón Configuración (API Key) -->
+          <button id="btn-open-config" title="Configurar API Key de IA"
+            class="relative w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition active:scale-95 text-sm sm:text-base border border-slate-200/60">
+            <i class="fa-solid fa-gear"></i>
+            <!-- Indicador si falta API Key -->
+            <span id="api-key-badge" class="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-white hidden"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Estado: Supermercado Activo y Estimación de Compra -->
+      <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+        
+        <!-- Selector de Supermercado Activo -->
+        <div class="flex items-center gap-1.5 min-w-0">
+          <label for="select-supermarket" class="text-xs text-slate-500 font-medium hidden xs:inline-flex items-center gap-1">
+            <i class="fa-solid fa-store text-slate-400 text-[11px]"></i> Super:
+          </label>
+          <div class="relative inline-flex items-center">
+            <select id="select-supermarket" 
+              class="appearance-none bg-slate-100 hover:bg-slate-200/80 font-bold text-xs sm:text-sm text-slate-800 py-1.5 pl-2.5 pr-7 rounded-xl border border-slate-200/80 focus:ring-2 focus:ring-brand-500 cursor-pointer transition max-w-[140px] sm:max-w-none truncate">
+              <!-- Se llena dinámicamente con JS -->
+            </select>
+            <i class="fa-solid fa-chevron-down text-[10px] text-slate-500 absolute right-2 pointer-events-none"></i>
+          </div>
+          <button id="btn-add-supermarket" title="Añadir otro supermercado" class="w-7 h-7 flex items-center justify-center text-xs text-slate-400 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+
+        <!-- Total Estimado Dinámico -->
+        <div class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-900 px-3 py-1.5 rounded-xl border border-emerald-200/70 shadow-sm flex-shrink-0">
+          <span class="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+            <i class="fa-solid fa-calculator text-[10px]"></i> <span class="hidden xs:inline">Total:</span>
+          </span>
+          <span id="estimated-total" class="font-extrabold text-xs sm:text-sm text-emerald-950 tracking-tight">0.00 €</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-5 pb-28">
+
+    <!-- INPUT AGREGAR PRODUCTOS (MOBILE FIRST) -->
+    <section class="bg-white rounded-2xl p-3 sm:p-4 shadow-apple border border-slate-200/70 mb-5 transition hover:shadow-apple-hover">
+      <form id="form-add-item" class="flex flex-col sm:flex-row gap-2.5">
+        
+        <!-- Input de Texto para el producto -->
+        <div class="relative flex-1">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i class="fa-solid fa-cart-plus"></i>
+          </span>
+          <input type="text" id="input-item-name" required
+            placeholder="¿Qué necesitas? Ej: 2 kg de tomates, leche, café..."
+            class="w-full pl-10 pr-10 py-2.5 sm:py-3 text-sm bg-slate-50 focus:bg-white rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition font-medium text-slate-800 placeholder:text-slate-400">
+          
+          <!-- Botón de borrado rápido de input -->
+          <button type="button" id="btn-clear-input" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-300 hover:text-slate-500 hidden">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Controles secundarios: Cantidad & Botón Agregar -->
+        <div class="flex items-center gap-2">
+          
+          <!-- Cantidad rápida -->
+          <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200">
+            <button type="button" id="btn-qty-minus" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white text-xs transition">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <input type="number" id="input-item-qty" value="1" min="1" max="99" 
+              class="w-9 text-center bg-transparent text-sm font-bold text-slate-800 outline-none border-0 p-0">
+            <button type="button" id="btn-qty-plus" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white text-xs transition">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+          <!-- Botón Añadir con Categorización IA -->
+          <button type="submit" id="btn-submit-item" 
+            class="flex-1 sm:flex-initial px-5 py-2.5 sm:py-3 bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 shadow-sm shadow-brand-600/30 transition">
+            <i class="fa-solid fa-wand-magic-sparkles text-brand-200"></i>
+            <span>Añadir</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Ayuda sutil sobre categorización automática -->
+      <div class="flex items-center justify-between text-[11px] text-slate-400 mt-2 px-1">
+        <span class="flex items-center gap-1">
+          <i class="fa-solid fa-brain text-brand-500"></i> 
+          <span>Clasificación automática por IA al escribir</span>
+        </span>
+        <span id="items-count-badge" class="font-semibold text-slate-500">0 productos</span>
+      </div>
+    </section>
+
+    <!-- ESTADO DE CARGA GLOBAL (AI SPINNER) -->
+    <div id="ai-loading-indicator" class="hidden mb-4 bg-brand-50 border border-brand-200 rounded-xl p-3 flex items-center justify-between text-brand-900 transition-all">
+      <div class="flex items-center gap-3">
+        <div class="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+        <div>
+          <p id="ai-loading-text" class="text-xs font-semibold">Procesando con Inteligencia Artificial...</p>
+          <p id="ai-loading-subtext" class="text-[11px] text-brand-700">Categorizando producto</p>
+        </div>
+      </div>
+      <span class="text-xs px-2 py-0.5 rounded-full bg-brand-200/60 font-bold text-brand-800 uppercase tracking-wider text-[10px]">IA</span>
+    </div>
+
+    <!-- CONTENEDOR DE LA LISTA DE LA COMPRA (CATEGORÍAS ACORDEÓN) -->
+    <section id="shopping-list-container" class="space-y-3.5">
+      <!-- Se inyecta dinámicamente con JS -->
+    </section>
+
+    <!-- ESTADO VACÍO (EMPTY STATE) -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-16 px-4 text-center">
+      <div class="w-20 h-20 mb-4 rounded-3xl bg-emerald-50 text-brand-500 flex items-center justify-center text-3xl shadow-inner">
+        <i class="fa-solid fa-basket-shopping"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-800">Tu lista está vacía</h3>
+      <p class="text-xs text-slate-500 max-w-xs mt-1">Añade productos arriba o escanea un ticket para extraer ingredientes automáticamente con la IA.</p>
+      <div class="mt-5 flex gap-2">
+        <button id="btn-quick-sample" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition">
+          <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Cargar lista de ejemplo
+        </button>
+      </div>
+    </div>
+
+    <!-- ACCIONES INFERIORES: LIMPIAR COMPLETADOS & BACKUP -->
+    <section class="mt-8 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <button id="btn-clear-completed" class="hover:text-rose-600 transition flex items-center gap-1.5 py-1 px-2 rounded-lg hover:bg-rose-50">
+          <i class="fa-regular fa-trash-can"></i> Borrar comprados
+        </button>
+        <span class="text-slate-300">|</span>
+        <button id="btn-clear-all" class="hover:text-rose-600 transition flex items-center gap-1.5 py-1 px-2 rounded-lg hover:bg-rose-50">
+          <i class="fa-solid fa-broom"></i> Vaciar lista
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btn-export-data" class="hover:text-slate-800 transition flex items-center gap-1.5 py-1 px-2 rounded-lg hover:bg-slate-100">
+          <i class="fa-solid fa-file-export"></i> Exportar JSON
+        </button>
+        <label for="input-import-data" class="hover:text-slate-800 transition flex items-center gap-1.5 py-1 px-2 rounded-lg hover:bg-slate-100 cursor-pointer">
+          <i class="fa-solid fa-file-import"></i> Importar JSON
+          <input type="file" id="input-import-data" accept=".json" class="hidden">
+        </label>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== BARRA FLOTANTE MÓVIL (ERGONOMÍA IPHONE / ANDROID) ==================== -->
+  <div class="sm:hidden fixed bottom-3 inset-x-3 z-30 pointer-events-none">
+    <div class="pointer-events-auto bg-white/95 backdrop-blur-lg border border-slate-200/90 shadow-2xl rounded-2xl px-4 py-2 flex items-center justify-around gap-2 text-slate-600">
+      
+      <!-- Botón Inicio / Ir a Input -->
+      <button type="button" onclick="focusAddInput()" class="flex flex-col items-center gap-0.5 text-brand-600 p-1 active:scale-95 transition">
+        <i class="fa-solid fa-plus-circle text-lg"></i>
+        <span class="text-[10px] font-bold">Añadir</span>
+      </button>
+
+      <!-- Botón Escáner de Tickets en el centro destacado -->
+      <button type="button" onclick="openOcrModal()" class="flex flex-col items-center gap-0.5 -mt-5 bg-gradient-to-tr from-brand-600 via-teal-600 to-emerald-500 text-white w-12 h-12 rounded-2xl shadow-lg shadow-brand-500/35 border-2 border-white flex items-center justify-center active:scale-95 transition">
+        <i class="fa-solid fa-camera text-lg"></i>
+      </button>
+
+      <!-- Botón Historial de Precios -->
+      <button type="button" onclick="openHistoryModal()" class="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 p-1 active:scale-95 transition">
+        <i class="fa-solid fa-chart-line text-lg"></i>
+        <span class="text-[10px] font-semibold">Precios</span>
+      </button>
+
+      <!-- Botón Ajustes -->
+      <button type="button" onclick="openConfigModal()" class="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 p-1 active:scale-95 transition">
+        <i class="fa-solid fa-gear text-lg"></i>
+        <span class="text-[10px] font-semibold">Ajustes</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE CONFIGURACIÓN (API KEY) ==================== -->
+  <div id="modal-config" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transition-all transform">
+      
+      <!-- Cabecera Modal -->
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-slate-800 text-sm">Configuración de Inteligencia Artificial</h2>
+            <p class="text-[11px] text-slate-500">Sin backend. Clave guardada sólo en tu navegador.</p>
+          </div>
+        </div>
+        <button id="btn-close-config" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Contenido Modal -->
+      <form id="form-config" class="p-5 space-y-4">
+        
+        <!-- Proveedor de IA -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Proveedor de IA</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 p-2.5 border rounded-xl cursor-pointer hover:bg-slate-50 transition border-brand-500 bg-brand-50/30">
+              <input type="radio" name="ai-provider" value="gemini" checked class="text-brand-600 focus:ring-brand-500">
+              <div class="text-xs">
+                <span class="font-bold text-slate-800 block">Google Gemini</span>
+                <span class="text-[10px] text-emerald-700 font-medium">Gratis / Recomendado</span>
+              </div>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 border rounded-xl cursor-pointer hover:bg-slate-50 transition border-slate-200">
+              <input type="radio" name="ai-provider" value="openai" class="text-brand-600 focus:ring-brand-500">
+              <div class="text-xs">
+                <span class="font-bold text-slate-800 block">OpenAI</span>
+                <span class="text-[10px] text-slate-500">GPT-4o / Vision</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Modelo Seleccionado -->
+        <div id="model-select-group">
+          <label for="select-ai-model" class="block text-xs font-semibold text-slate-700 mb-1">Modelo de LLM / Visión</label>
+          <select id="select-ai-model" class="w-full text-xs font-medium p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Rápido y Óptimo)</option>
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Más reciente)</option>
+          </select>
+        </div>
+
+        <!-- Input API Key -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="input-api-key" class="text-xs font-semibold text-slate-700">API Key del Proveedor</label>
+            <a id="link-get-key" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" 
+              class="text-[11px] text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1">
+              <span>Obtener clave gratis</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </a>
+          </div>
+          <div class="relative">
+            <input type="password" id="input-api-key" placeholder="AIzaSy..."
+              class="w-full pl-3 pr-10 py-2.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+            <button type="button" id="btn-toggle-key-visibility" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+              <i class="fa-solid fa-eye text-xs"></i>
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1">
+            <i class="fa-solid fa-shield-halved mr-0.5"></i> Tu API Key se almacena localmente en tu navegador (`localStorage`) y nunca sale a ningún servidor intermediario.
+          </p>
+        </div>
+
+        <!-- Test de Conexión -->
+        <div class="pt-1">
+          <button type="button" id="btn-test-connection" 
+            class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-xl flex items-center justify-center gap-2 transition active:scale-98">
+            <i class="fa-solid fa-plug"></i> Probar Conexión
+          </button>
+          <div id="test-connection-result" class="hidden mt-2 p-2 rounded-lg text-xs font-medium text-center"></div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" id="btn-cancel-config" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition">
+            Cancelar
+          </button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-600/30 transition">
+            Guardar Configuración
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE ESCANEO OCR DE TICKETS ==================== -->
+  <div id="modal-ocr" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col overflow-hidden">
+      
+      <!-- Cabecera Modal OCR -->
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 text-white flex items-center justify-center text-sm shadow-sm">
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-slate-800 text-sm">Escáner Inteligente de Tickets</h2>
+            <p class="text-[11px] text-slate-500">Extrae precios y productos con IA Vision</p>
+          </div>
+        </div>
+        <button id="btn-close-ocr" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Cuerpo Modal OCR con Scroll -->
+      <div class="p-5 space-y-4 overflow-y-auto no-scrollbar flex-1">
+        
+        <!-- Zona de Carga / Captura de Imagen -->
+        <div id="ocr-upload-zone" class="border-2 border-dashed border-slate-200 hover:border-brand-500 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-50/50 hover:bg-brand-50/20 group">
+          <input type="file" id="input-ticket-file" accept="image/*" capture="environment" class="hidden">
+          
+          <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-white shadow-sm border border-slate-200/60 text-brand-600 flex items-center justify-center text-2xl group-hover:scale-105 transition">
+            <i class="fa-solid fa-camera-retro"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-800">Toma una foto o sube un ticket</p>
+          <p class="text-[11px] text-slate-400 mt-1">Formatos JPG, PNG, WebP o captura directa con la cámara</p>
+          <button type="button" class="mt-3 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm pointer-events-none">
+            Seleccionar imagen
+          </button>
+        </div>
+
+        <!-- Previsualización de Imagen -->
+        <div id="ocr-preview-container" class="hidden space-y-3">
+          <div class="relative rounded-xl overflow-hidden border border-slate-200 max-h-56 bg-slate-900 flex items-center justify-center">
+            <img id="ocr-preview-img" src="" alt="Ticket preview" class="w-full h-auto object-contain max-h-56">
+            <button type="button" id="btn-ocr-retake" class="absolute top-2 right-2 px-2.5 py-1 bg-black/60 hover:bg-black/80 text-white rounded-lg text-xs font-medium backdrop-blur-sm transition">
+              <i class="fa-solid fa-rotate-right mr-1"></i> Cambiar foto
+            </button>
+          </div>
+
+          <!-- Botón de Análisis -->
+          <button type="button" id="btn-process-ocr" 
+            class="w-full py-2.5 bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-700 hover:to-emerald-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-500/20 flex items-center justify-center gap-2 transition active:scale-98">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Analizar Ticket con IA
+          </button>
+        </div>
+
+        <!-- Spinner y Progreso de OCR -->
+        <div id="ocr-loading-state" class="hidden p-6 text-center space-y-3">
+          <div class="w-10 h-10 border-3 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div>
+            <h4 id="ocr-step-title" class="text-xs font-bold text-slate-800">Analizando ticket con IA Vision...</h4>
+            <p id="ocr-step-desc" class="text-[11px] text-slate-500 mt-0.5">Detectando supermercado, fecha y extrayendo artículos y precios...</p>
+          </div>
+        </div>
+
+        <!-- Resultados de Extracción y Fuzzy Matching -->
+        <div id="ocr-results-container" class="hidden space-y-4">
+          
+          <!-- Metadatos Detectados -->
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs">
+            <div>
+              <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Supermercado</span>
+              <span id="ocr-detected-market" class="font-bold text-slate-800">Desconocido</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Fecha</span>
+              <span id="ocr-detected-date" class="font-medium text-slate-700">Hoy</span>
+            </div>
+            <div class="text-right">
+              <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Total Ticket</span>
+              <span id="ocr-detected-total" class="font-bold text-brand-700">0.00 €</span>
+            </div>
+          </div>
+
+          <!-- Lista de Artículos Extraídos con Fuzzy Matching -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <span>Artículos del Ticket</span>
+                <span id="ocr-matched-count" class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  0 coincidencias con tu lista
+                </span>
+              </h4>
+              <button type="button" id="btn-toggle-all-ocr" class="text-[11px] text-brand-600 font-semibold hover:underline">
+                Seleccionar todo
+              </button>
+            </div>
+
+            <!-- Contenedor scrollable de artículos -->
+            <div id="ocr-items-list" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+              <!-- Inyectado dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie Modal OCR -->
+      <div id="ocr-footer-actions" class="px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between hidden">
+        <button type="button" id="btn-cancel-ocr-review" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 rounded-lg hover:bg-slate-200/60 transition">
+          Descartar
+        </button>
+        <button type="button" id="btn-apply-ocr" class="px-4 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-600/30 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-check"></i>
+          <span>Actualizar Lista y Precios</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE HISTORIAL Y COMPARADOR DE PRECIOS ==================== -->
+  <div id="modal-history" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col overflow-hidden">
+      
+      <!-- Cabecera Modal Historial -->
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-slate-800 text-sm">Historial & Comparador de Precios</h2>
+            <p class="text-[11px] text-slate-500">Precios registrados por supermercado</p>
+          </div>
+        </div>
+        <button id="btn-close-history" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Buscador y Botón Añadir Precio Manual -->
+      <div class="p-3 border-b border-slate-100 bg-white flex items-center gap-2">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+          <input type="text" id="input-search-history" placeholder="Buscar producto en el histórico..."
+            class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-brand-500">
+        </div>
+        <button type="button" id="btn-add-price-manual-from-history" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold flex items-center gap-1 transition flex-shrink-0">
+          <i class="fa-solid fa-plus text-[10px]"></i>
+          <span>Nuevo Precio</span>
+        </button>
+      </div>
+
+      <!-- Lista del Histórico -->
+      <div id="history-items-container" class="p-4 space-y-2.5 overflow-y-auto flex-1 text-xs">
+        <!-- Renderizado dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL EDITAR / AÑADIR PRECIO MANUAL ==================== -->
+  <div id="modal-edit-price" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm shadow-sm">
+            <i class="fa-solid fa-tag"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-800" id="edit-price-item-title">Precio del producto</h3>
+            <p class="text-[11px] text-slate-500" id="edit-price-item-subtitle">Registrar precio unitario</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEditPriceModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-edit-price" class="space-y-3">
+        <input type="hidden" id="edit-price-item-id" value="">
+
+        <!-- Input Nombre del Producto (visible si es nuevo desde historial) -->
+        <div id="group-edit-price-name" class="hidden">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre del Producto</label>
+          <input type="text" id="input-manual-price-name" placeholder="Ej: Arroz redondo, Aceite de oliva..."
+            class="w-full text-xs font-semibold p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <!-- Selector de Supermercado para este precio -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Supermercado</label>
+          <select id="edit-price-supermarket" class="w-full text-xs font-bold p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none">
+            <!-- Llena dinámicamente con JS -->
+          </select>
+        </div>
+
+        <!-- Input de Precio Unitario -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Precio Unitario (€)</label>
+          <div class="relative">
+            <input type="number" step="0.01" min="0" id="input-manual-price-value" required placeholder="0.00"
+              class="w-full pl-3 pr-8 py-2.5 text-base font-extrabold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none">
+            <span class="absolute inset-y-0 right-3.5 flex items-center text-slate-400 font-bold text-sm pointer-events-none">€</span>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-clock-rotate-left"></i> Se registrará en el histórico con fecha de hoy.
+          </p>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeEditPriceModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-600/30 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-check"></i>
+            <span>Guardar Precio</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL AÑADIR SUPERMERCADO ==================== -->
+  <div id="modal-add-supermarket" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-xs rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-3">
+      <h3 class="font-bold text-sm text-slate-800">Nuevo Supermercado</h3>
+      <input type="text" id="input-new-supermarket-name" placeholder="Ej: Eroski, Ahorramas..." 
+        class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-500">
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" id="btn-cancel-add-supermarket" class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+        <button type="button" id="btn-confirm-add-supermarket" class="px-3 py-1.5 text-xs bg-brand-600 text-white font-semibold rounded-lg hover:bg-brand-700">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATIONS ==================== -->
+  <div id="toast-container" class="fixed bottom-5 right-5 left-5 sm:left-auto sm:w-80 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+  <!-- ==================== LOGICA & SCRIPT COMPLETO (ES6+) ==================== -->
+  <script>
+    /**
+     * TUCOMPRA AI - Single File WebApp Logic
+     * Almacenamiento exclusivo en localStorage, llamadas directas fetch a Gemini/OpenAI,
+     * Fuzzy matching para cruce de tickets OCR y categorización automática.
+     */
+
+    // --- 1. DEFINICIÓN DE CATEGORÍAS PREDEFINIDAS ---
+    const CATEGORIES = [
+      { id: 'frutas-verduras', name: 'Frutas y Verduras', icon: 'fa-apple-whole', color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
+      { id: 'carnes-pescados', name: 'Carnes y Pescados', icon: 'fa-drumstick-bite', color: 'text-rose-600 bg-rose-50 border-rose-100' },
+      { id: 'lacteos-huevos', name: 'Lácteos y Huevos', icon: 'fa-egg', color: 'text-amber-600 bg-amber-50 border-amber-100' },
+      { id: 'panaderia', name: 'Panadería y Pastelería', icon: 'fa-bread-slice', color: 'text-yellow-700 bg-yellow-50 border-yellow-100' },
+      { id: 'despensa', name: 'Despensa, Pastas y Conservas', icon: 'fa-boxes-stacked', color: 'text-orange-600 bg-orange-50 border-orange-100' },
+      { id: 'congelados', name: 'Congelados', icon: 'fa-snowflake', color: 'text-cyan-600 bg-cyan-50 border-cyan-100' },
+      { id: 'bebidas', name: 'Bebidas', icon: 'fa-bottle-water', color: 'text-blue-600 bg-blue-50 border-blue-100' },
+      { id: 'limpieza-hogar', name: 'Limpieza y Hogar', icon: 'fa-soap', color: 'text-indigo-600 bg-indigo-50 border-indigo-100' },
+      { id: 'cuidado-personal', name: 'Cuidado Personal y Salud', icon: 'fa-heart-pulse', color: 'text-pink-600 bg-pink-50 border-pink-100' },
+      { id: 'mascotas', name: 'Mascotas', icon: 'fa-paw', color: 'text-teal-600 bg-teal-50 border-teal-100' },
+      { id: 'otros', name: 'Otros y Varios', icon: 'fa-tags', color: 'text-slate-600 bg-slate-100 border-slate-200' }
+    ];
+
+    // --- 2. SUPERMERCADOS POR DEFECTO ---
+    const DEFAULT_SUPERMARKETS = [
+      { id: 'mercadona', name: 'Mercadona' },
+      { id: 'carrefour', name: 'Carrefour' },
+      { id: 'lidl', name: 'Lidl' },
+      { id: 'dia', name: 'Dia' },
+      { id: 'alcampo', name: 'Alcampo' },
+      { id: 'otro', name: 'Otro / General' }
+    ];
+
+    // --- 3. DICCIONARIO HEURÍSTICO OFFLINE (FALLBACK SI NO HAY API KEY) ---
+    const OFFLINE_RULES = {
+      'frutas-verduras': ['manzana', 'platano', 'pera', 'tomate', 'lechuga', 'patata', 'cebolla', 'zanahoria', 'limon', 'naranja', 'fresa', 'aguacate', 'ajo', 'calabacin', 'pimiento', 'pepino', 'uva', 'sandia', 'melon', 'champinon', 'setas'],
+      'carnes-pescados': ['pollo', 'ternera', 'cerdo', 'pavo', 'carne', 'salmon', 'merluza', 'atun fresco', 'bacalao', 'gambas', 'langostinos', 'hamburguesa', 'solomillo', 'costillas', 'lomo', 'pechuga'],
+      'lacteos-huevos': ['leche', 'queso', 'yogur', 'huevo', 'huevos', 'mantequilla', 'nata', 'cuajada', 'kefir'],
+      'panaderia': ['pan', 'baguette', 'croissant', 'bollo', 'tostadas', 'magdalenas', 'galletas', 'harina', 'bizcocho'],
+      'despensa': [
+        'arroz', 'pasta', 'macarrones', 'espaguetis', 'tallarines', 'fideos', 'plumas', 'espirales', 'noodles', 'cuscus', 'semola',
+        'legumbres', 'garbanzos', 'lentejas', 'alubias', 'judias', 'fabada', 'bote garbanzos', 'bote lentejas',
+        'aceite', 'oliva', 'girasol', 'vinagre', 'sal', 'azucar', 'especias', 'pimienta', 'oregano',
+        'conservas', 'conserva', 'lata', 'latas', 'atun', 'bonito', 'sardinas', 'mejillones', 'berberechos', 'aceitunas', 'olivas',
+        'tomate frito', 'tomate triturado', 'maiz', 'esparragos', 'alcachofas', 'champinon lata', 'pimientos piquillo',
+        'cafe', 'te', 'infusion', 'cereales', 'avena'
+      ],
+      'congelados': [
+        'helado', 'helados', 'pizza congelada', 'guisantes congelados', 'verduras congeladas', 'pescado congelado',
+        'merluza congelada', 'hielo', 'croquetas', 'patatas congeladas', 'empanadillas', 'marisco congelado', 'nuggets'
+      ],
+      'bebidas': ['agua', 'cerveza', 'vino', 'refresco', 'coca cola', 'zumo', 'fanta', 'tonica'],
+      'limpieza-hogar': ['detergente', 'suavizante', 'lavavajillas', 'fairy', 'lejia', 'fregasuelos', 'papel higienico', 'papel cocina', 'bayeta', 'estropajo', 'bolsas basura'],
+      'cuidado-personal': ['champu', 'gel', 'desodorante', 'pasta dientes', 'cepillo', 'jabon', 'crema', 'colonia', 'protector solar'],
+      'mascotas': ['pienso', 'comida perro', 'comida gato', 'arena gato', 'snacks perro']
+    };
+
+    // --- 4. ESTADO DE LA APLICACIÓN ---
+    let state = {
+      items: [],
+      supermarkets: [],
+      pricesHistory: [],
+      activeSupermarketId: 'mercadona',
+      collapsedCategories: {}, // guarda qué categorías están plegadas
+      config: {
+        aiProvider: 'gemini',
+        apiKey: '',
+        geminiModel: 'gemini-1.5-flash',
+        openaiModel: 'gpt-4o-mini'
+      }
+    };
+
+    // Objeto temporal para el ticket analizado
+    let currentOcrData = null;
+
+    // --- 5. INICIALIZACIÓN Y PERSISTENCIA (LOCALSTORAGE) ---
+    function initApp() {
+      loadStateFromLocalStorage();
+      renderSupermarketSelect();
+      renderShoppingList();
+      updateEstimatedTotal();
+      checkApiKeyBadge();
+      setupEventListeners();
+    }
+
+    function loadStateFromLocalStorage() {
+      try {
+        const storedItems = localStorage.getItem('tucompra_items');
+        state.items = storedItems ? JSON.parse(storedItems) : [];
+
+        const storedSupers = localStorage.getItem('tucompra_supermarkets');
+        state.supermarkets = storedSupers ? JSON.parse(storedSupers) : DEFAULT_SUPERMARKETS;
+
+        const storedPrices = localStorage.getItem('tucompra_prices_history');
+        state.pricesHistory = storedPrices ? JSON.parse(storedPrices) : [];
+
+        const storedActiveSuper = localStorage.getItem('tucompra_active_supermarket');
+        if (storedActiveSuper && state.supermarkets.some(s => s.id === storedActiveSuper)) {
+          state.activeSupermarketId = storedActiveSuper;
+        } else {
+          state.activeSupermarketId = state.supermarkets[0]?.id || 'mercadona';
+        }
+
+        const storedConfig = localStorage.getItem('tucompra_config');
+        if (storedConfig) {
+          state.config = { ...state.config, ...JSON.parse(storedConfig) };
+        }
+
+        const storedCollapsed = localStorage.getItem('tucompra_collapsed_cats');
+        if (storedCollapsed) {
+          state.collapsedCategories = JSON.parse(storedCollapsed);
+        }
+      } catch (err) {
+        console.error('Error al cargar del localStorage:', err);
+        showToast('Error cargando los datos guardados', 'error');
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('tucompra_items', JSON.stringify(state.items));
+        localStorage.setItem('tucompra_supermarkets', JSON.stringify(state.supermarkets));
+        localStorage.setItem('tucompra_prices_history', JSON.stringify(state.pricesHistory));
+        localStorage.setItem('tucompra_active_supermarket', state.activeSupermarketId);
+        localStorage.setItem('tucompra_config', JSON.stringify(state.config));
+        localStorage.setItem('tucompra_collapsed_cats', JSON.stringify(state.collapsedCategories));
+      } catch (err) {
+        console.error('Error al guardar en localStorage:', err);
+      }
+    }
+
+    function checkApiKeyBadge() {
+      const badge = document.getElementById('api-key-badge');
+      if (!state.config.apiKey) {
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // --- 6. RENDERIZADO: SELECTOR DE SUPERMERCADOS ---
+    function renderSupermarketSelect() {
+      const select = document.getElementById('select-supermarket');
+      select.innerHTML = '';
+      state.supermarkets.forEach(s => {
+        const option = document.createElement('option');
+        option.value = s.id;
+        option.textContent = s.name;
+        if (s.id === state.activeSupermarketId) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      });
+    }
+
+    // --- 7. CÁLCULO DEL TOTAL ESTIMADO ---
+    function getEstimatedPriceForItem(itemName, supermarketId) {
+      const normName = normalizeText(itemName);
+      
+      // 1. Buscar coincidencia exacta en el supermercado activo
+      const exactMatch = state.pricesHistory
+        .filter(p => normalizeText(p.itemName) === normName && p.supermarketId === supermarketId)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+      if (exactMatch) return exactMatch.price;
+
+      // 2. Buscar por fuzzy match en el supermercado activo
+      for (const p of state.pricesHistory) {
+        if (p.supermarketId === supermarketId && similarityScore(normName, normalizeText(p.itemName)) >= 0.7) {
+          return p.price;
+        }
+      }
+
+      // 3. Buscar el último precio en cualquier supermercado como aproximación
+      const anyMatch = state.pricesHistory
+        .filter(p => normalizeText(p.itemName) === normName)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+      if (anyMatch) return anyMatch.price;
+
+      return 0; // Sin registro
+    }
+
+    function updateEstimatedTotal() {
+      let total = 0;
+      let itemsWithPrice = 0;
+
+      // Calcular solo ítems pendientes de compra
+      const pendingItems = state.items.filter(i => !i.checked);
+
+      pendingItems.forEach(item => {
+        const unitPrice = getEstimatedPriceForItem(item.name, state.activeSupermarketId);
+        if (unitPrice > 0) {
+          total += unitPrice * (item.quantity || 1);
+          itemsWithPrice++;
+        }
+      });
+
+      const totalEl = document.getElementById('estimated-total');
+      totalEl.textContent = `${total.toFixed(2)} €`;
+
+      // Contador de ítems en badge
+      const countEl = document.getElementById('items-count-badge');
+      const totalCount = state.items.length;
+      const completedCount = state.items.filter(i => i.checked).length;
+      countEl.textContent = `${completedCount}/${totalCount} comprados`;
+    }
+
+    // --- 8. RENDERIZADO DE LA LISTA DE LA COMPRA (ACORDEONES) ---
+    function renderShoppingList() {
+      const container = document.getElementById('shopping-list-container');
+      const emptyState = document.getElementById('empty-state');
+
+      if (!state.items || state.items.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+        updateEstimatedTotal();
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      emptyState.classList.remove('flex');
+
+      // Agrupar ítems por categoría
+      const grouped = {};
+      CATEGORIES.forEach(c => grouped[c.id] = []);
+
+      state.items.forEach(item => {
+        const catId = item.category || 'otros';
+        if (!grouped[catId]) grouped[catId] = [];
+        grouped[catId].push(item);
+      });
+
+      let html = '';
+
+      CATEGORIES.forEach(cat => {
+        const catItems = grouped[cat.id];
+        if (catItems.length === 0) return; // Ocultar categorías vacías
+
+        const isCollapsed = !!state.collapsedCategories[cat.id];
+        const pendingInCat = catItems.filter(i => !i.checked).length;
+
+        // Calcular estimado de la categoría
+        let catEstimatedTotal = 0;
+        catItems.forEach(item => {
+          const p = getEstimatedPriceForItem(item.name, state.activeSupermarketId);
+          if (p > 0) catEstimatedTotal += p * (item.quantity || 1);
+        });
+
+        html += `
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-apple overflow-hidden transition-all duration-200">
+            <!-- Header Acordeón -->
+            <button type="button" onclick="toggleCategory('${cat.id}')"
+              class="w-full px-4 py-3 bg-slate-50/70 hover:bg-slate-100/70 flex items-center justify-between text-left transition select-none">
+              <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-xl flex items-center justify-center text-xs border ${cat.color}">
+                  <i class="fa-solid ${cat.icon}"></i>
+                </span>
+                <div>
+                  <h3 class="text-xs font-bold text-slate-800 tracking-tight">${cat.name}</h3>
+                  <div class="flex items-center gap-2 text-[11px] text-slate-500">
+                    <span>${pendingInCat} pendientes</span>
+                    ${catEstimatedTotal > 0 ? `<span class="text-emerald-700 font-semibold">• ~${catEstimatedTotal.toFixed(2)} €</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-200/60 text-slate-700">${catItems.length}</span>
+                <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}"></i>
+              </div>
+            </button>
+
+            <!-- Lista de Ítems de la categoría -->
+            <div class="${isCollapsed ? 'hidden' : 'block'} divide-y divide-slate-100">
+              ${catItems.map(item => renderItemRow(item)).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      updateEstimatedTotal();
+    }
+
+    function renderItemRow(item) {
+      const unitPrice = getEstimatedPriceForItem(item.name, state.activeSupermarketId);
+      const totalItemEst = unitPrice > 0 ? (unitPrice * item.quantity).toFixed(2) : null;
+
+      return `
+        <div class="p-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-50/70 transition ${item.checked ? 'bg-slate-50/40 opacity-60' : ''}" id="item-${item.id}">
+          
+          <!-- Checkbox grande táctil + Nombre + Cantidad -->
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <button type="button" onclick="toggleItemChecked('${item.id}')"
+              class="checkbox-custom w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center text-sm border-2 transition ${
+                item.checked 
+                  ? 'bg-brand-500 border-brand-500 text-white shadow-sm' 
+                  : 'border-slate-300 hover:border-brand-500 text-transparent bg-white'
+              }">
+              <i class="fa-solid fa-check text-xs"></i>
+            </button>
+
+            <div class="min-w-0 flex-1 cursor-pointer" onclick="toggleItemChecked('${item.id}')">
+              <div class="flex items-center gap-2">
+                <span class="text-xs sm:text-sm font-semibold truncate ${item.checked ? 'line-through text-slate-400' : 'text-slate-800'}">
+                  ${escapeHtml(item.name)}
+                </span>
+                ${item.isAiClassified ? `<span title="Clasificado por IA" class="text-[9px] px-1.5 py-0.2 rounded bg-brand-50 text-brand-700 font-bold border border-brand-200">IA</span>` : ''}
+              </div>
+              <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5 flex-wrap">
+                <span class="font-medium text-slate-500">${item.quantity} ${item.unit || 'ud.'}</span>
+                <span>•</span>
+                <!-- Badge de Precio Interactivo (Tap para editar manualmente) -->
+                <button type="button" onclick="event.stopPropagation(); openEditPriceModal('${item.id}')"
+                  title="Toca para asignar o cambiar precio"
+                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md transition ${
+                    unitPrice > 0 
+                      ? 'bg-emerald-50 text-emerald-800 font-bold hover:bg-emerald-100 border border-emerald-200/60' 
+                      : 'text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 border border-dashed border-slate-300 hover:border-emerald-300'
+                  }">
+                  ${totalItemEst 
+                    ? `<span>~${totalItemEst} € (${unitPrice.toFixed(2)}€/ud)</span> <i class="fa-solid fa-pen text-[8px] opacity-70"></i>` 
+                    : `<i class="fa-solid fa-tag text-[9px]"></i> <span>Poner precio</span>`
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones del ítem (Asignar precio / Cambiar categoría / Eliminar) -->
+          <div class="flex items-center gap-1">
+            
+            <!-- Botón Editar Precio Manual -->
+            <button type="button" onclick="openEditPriceModal('${item.id}')" title="Asignar o editar precio"
+              class="w-7 h-7 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 flex items-center justify-center text-xs transition">
+              <i class="fa-solid fa-euro-sign"></i>
+            </button>
+
+            <!-- Selector rápido de categoría -->
+            <button type="button" onclick="promptChangeCategory('${item.id}')" title="Cambiar categoría"
+              class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center text-xs transition">
+              <i class="fa-solid fa-layer-group"></i>
+            </button>
+
+            <!-- Borrar Ítem -->
+            <button type="button" onclick="deleteItem('${item.id}')" title="Eliminar ítem"
+              class="w-7 h-7 rounded-lg text-slate-300 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center text-xs transition">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- 9. INTERACCIÓN CON ÍTEMS ---
+    function toggleCategory(catId) {
+      state.collapsedCategories[catId] = !state.collapsedCategories[catId];
+      saveState();
+      renderShoppingList();
+    }
+
+    function toggleItemChecked(id) {
+      const item = state.items.find(i => i.id === id);
+      if (item) {
+        item.checked = !item.checked;
+        saveState();
+        renderShoppingList();
+      }
+    }
+
+    function deleteItem(id) {
+      state.items = state.items.filter(i => i.id !== id);
+      saveState();
+      renderShoppingList();
+    }
+
+    function promptChangeCategory(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const catNames = CATEGORIES.map((c, idx) => `${idx + 1}. ${c.name}`).join('\n');
+      const input = prompt(`Elige el número de categoría para "${item.name}":\n\n${catNames}`);
+      if (input) {
+        const choice = parseInt(input.trim()) - 1;
+        if (choice >= 0 && choice < CATEGORIES.length) {
+          item.category = CATEGORIES[choice].id;
+          item.isAiClassified = false;
+          saveState();
+          renderShoppingList();
+          showToast(`Categoría cambiada a ${CATEGORIES[choice].name}`, 'success');
+        }
+      }
+    }
+
+    // --- 10. CLASIFICACIÓN DE PRODUCTOS (IA CON FALLBACK HEURÍSTICO) ---
+    function classifyItemOffline(text) {
+      const lower = normalizeText(text);
+      for (const [catId, keywords] of Object.entries(OFFLINE_RULES)) {
+        for (const kw of keywords) {
+          if (lower.includes(kw)) {
+            return catId;
+          }
+        }
+      }
+      return 'otros';
+    }
+
+    async function classifyItemWithAI(itemName) {
+      // Si no hay API key configurada, usamos el motor heurístico local
+      if (!state.config.apiKey) {
+        return { category: classifyItemOffline(itemName), isAi: false };
+      }
+
+      showAiLoading(true, 'Categorizando producto con IA...', itemName);
+
+      try {
+        const categoriesList = CATEGORIES.map(c => `"${c.id}" (${c.name})`).join(', ');
+        const prompt = `Clasifica el siguiente producto de la compra en exactamente una de estas categorías: [${categoriesList}]. 
+Producto: "${itemName}".
+Responde ÚNICAMENTE un objeto JSON válido con el formato: {"category": "id_de_la_categoria"}`;
+
+        let catId = 'otros';
+
+        if (state.config.aiProvider === 'gemini') {
+          const model = state.config.geminiModel || 'gemini-1.5-flash';
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${state.config.apiKey}`;
+
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                responseMimeType: "application/json",
+                temperature: 0.1
+              }
+            })
+          });
+
+          if (!res.ok) throw new Error(`Error API Gemini (${res.status})`);
+          const data = await res.json();
+          const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+          const parsed = JSON.parse(cleanJsonString(rawText));
+          if (parsed.category && CATEGORIES.some(c => c.id === parsed.category)) {
+            catId = parsed.category;
+          }
+        } else {
+          // OpenAI
+          const model = state.config.openaiModel || 'gpt-4o-mini';
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.config.apiKey}`
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [{ role: 'user', content: prompt }],
+              temperature: 0.1,
+              response_format: { type: "json_object" }
+            })
+          });
+
+          if (!res.ok) throw new Error(`Error API OpenAI (${res.status})`);
+          const data = await res.json();
+          const parsed = JSON.parse(data.choices?.[0]?.message?.content || '{}');
+          if (parsed.category && CATEGORIES.some(c => c.id === parsed.category)) {
+            catId = parsed.category;
+          }
+        }
+
+        return { category: catId, isAi: true };
+      } catch (err) {
+        console.warn('Fallo en IA, recurriendo a heurística offline:', err);
+        return { category: classifyItemOffline(itemName), isAi: false };
+      } finally {
+        showAiLoading(false);
+      }
+    }
+
+    // Parser inteligente de texto libre (e.g., "2 kg de manzanas", "3 leches")
+    function parseQuantityAndName(raw) {
+      let text = raw.trim();
+      let qty = 1;
+      let unit = 'ud.';
+
+      // Patrón de cantidad y unidad al inicio
+      const match = text.match(/^(\d+(?:[.,]\d+)?)\s*(kg|g|l|ml|pack|docena|unidades|uds|ud|latas|botellas|botes)?\s+(?:de\s+)?(.+)$/i);
+      if (match) {
+        qty = parseFloat(match[1].replace(',', '.'));
+        if (match[2]) unit = match[2].toLowerCase();
+        text = match[3];
+      }
+
+      return {
+        name: capitalize(text),
+        quantity: isNaN(qty) ? 1 : qty,
+        unit: unit
+      };
+    }
+
+    // --- 11. MANEJO DE AÑADIR PRODUCTOS ---
+    async function handleAddItem(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('input-item-name');
+      const qtyInput = document.getElementById('input-item-qty');
+      const rawText = input.value.trim();
+
+      if (!rawText) return;
+
+      const parsed = parseQuantityAndName(rawText);
+      const manualQty = parseInt(qtyInput.value) || 1;
+      const finalQty = parsed.quantity > 1 ? parsed.quantity : manualQty;
+
+      // Asignar categoría inicial offline para feedback ultra-rápido
+      const initialCat = classifyItemOffline(parsed.name);
+      
+      const newItem = {
+        id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        name: parsed.name,
+        category: initialCat,
+        quantity: finalQty,
+        unit: parsed.unit,
+        checked: false,
+        isAiClassified: false,
+        addedAt: new Date().toISOString()
+      };
+
+      state.items.unshift(newItem);
+      saveState();
+      renderShoppingList();
+
+      input.value = '';
+      qtyInput.value = '1';
+      document.getElementById('btn-clear-input').classList.add('hidden');
+
+      // Si hay API key, refinar en segundo plano con la IA
+      if (state.config.apiKey) {
+        classifyItemWithAI(newItem.name).then(result => {
+          if (result.category && result.category !== newItem.category) {
+            newItem.category = result.category;
+            newItem.isAiClassified = result.isAi;
+            saveState();
+            renderShoppingList();
+            showToast(`"${newItem.name}" organizado en ${getCategoryName(result.category)}`, 'info');
+          } else if (result.isAi) {
+            newItem.isAiClassified = true;
+            saveState();
+            renderShoppingList();
+          }
+        });
+      }
+    }
+
+    // --- 12. MÓDULO OCR DE TICKETS CON VISIÓN (GEMINI / OPENAI) ---
+    async function handleTicketFileSelect(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Previsualizar imagen
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Data = event.target.result;
+        document.getElementById('ocr-preview-img').src = base64Data;
+        document.getElementById('ocr-upload-zone').classList.add('hidden');
+        document.getElementById('ocr-preview-container').classList.remove('hidden');
+        document.getElementById('ocr-results-container').classList.add('hidden');
+        document.getElementById('ocr-footer-actions').classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Redimensionar y optimizar la imagen antes de enviar para rapidez y límites de payload
+    async function getOptimizedBase64(imgElement, maxWidth = 1200) {
+      return new Promise((resolve) => {
+        const canvas = document.createElement('canvas');
+        let width = imgElement.naturalWidth || imgElement.width;
+        let height = imgElement.naturalHeight || imgElement.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(imgElement, 0, 0, width, height);
+
+        // Convertir a JPEG optimizado
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        resolve(dataUrl);
+      });
+    }
+
+    async function processTicketOCR() {
+      if (!state.config.apiKey) {
+        showToast('Debes configurar tu API Key antes de escanear tickets', 'warning');
+        openConfigModal();
+        return;
+      }
+
+      const previewImg = document.getElementById('ocr-preview-img');
+      const loadingState = document.getElementById('ocr-loading-state');
+      const previewContainer = document.getElementById('ocr-preview-container');
+      const resultsContainer = document.getElementById('ocr-results-container');
+      const footerActions = document.getElementById('ocr-footer-actions');
+
+      previewContainer.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+
+      try {
+        const optimizedDataUrl = await getOptimizedBase64(previewImg);
+        const base64Content = optimizedDataUrl.split(',')[1];
+        const mimeType = 'image/jpeg';
+
+        const systemPrompt = `Eres un sistema OCR de tickets de compra de supermercados de España/Latinoamérica.
+Analiza la imagen del ticket y extrae detalladamente la información.
+Responde ÚNICAMENTE en JSON con la siguiente estructura:
+{
+  "supermarket": "Nombre del supermercado (ej: Mercadona, Carrefour, Lidl, Dia, Alcampo, etc.)",
+  "date": "YYYY-MM-DD (o fecha aproximada)",
+  "total": 0.00,
+  "items": [
+    {
+      "rawName": "Nombre tal cual aparece en el ticket",
+      "cleanName": "Nombre genérico normalizado (ej: Leche entera, Plátanos, Tomate triturado)",
+      "quantity": 1,
+      "unitPrice": 1.25,
+      "totalPrice": 1.25
+    }
+  ]
+}`;
+
+        let parsedResult = null;
+
+        if (state.config.aiProvider === 'gemini') {
+          const model = state.config.geminiModel || 'gemini-1.5-flash';
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${state.config.apiKey}`;
+
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: systemPrompt },
+                  {
+                    inlineData: {
+                      mimeType: mimeType,
+                      data: base64Content
+                    }
+                  }
+                ]
+              }],
+              generationConfig: {
+                responseMimeType: "application/json",
+                temperature: 0.1
+              }
+            })
+          });
+
+          if (!res.ok) {
+            const errBody = await res.text();
+            throw new Error(`Error en API Gemini (${res.status}): ${errBody}`);
+          }
+
+          const data = await res.json();
+          const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+          parsedResult = JSON.parse(cleanJsonString(rawText));
+
+        } else {
+          // OpenAI Vision
+          const model = state.config.openaiModel || 'gpt-4o-mini';
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.config.apiKey}`
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                {
+                  role: 'user',
+                  content: [
+                    { type: 'text', text: systemPrompt },
+                    { type: 'image_url', image_url: { url: optimizedDataUrl } }
+                  ]
+                }
+              ],
+              temperature: 0.1,
+              response_format: { type: "json_object" }
+            })
+          });
+
+          if (!res.ok) {
+            const errBody = await res.text();
+            throw new Error(`Error en API OpenAI (${res.status}): ${errBody}`);
+          }
+
+          const data = await res.json();
+          parsedResult = JSON.parse(data.choices?.[0]?.message?.content || '{}');
+        }
+
+        if (!parsedResult || !parsedResult.items || parsedResult.items.length === 0) {
+          throw new Error('No se detectaron artículos en la imagen');
+        }
+
+        // Cruzar datos con Fuzzy Matching
+        currentOcrData = matchOcrWithShoppingList(parsedResult);
+        renderOcrResults(currentOcrData);
+
+        loadingState.classList.add('hidden');
+        resultsContainer.classList.remove('hidden');
+        footerActions.classList.remove('hidden');
+        showToast(`¡Ticket analizado con éxito! (${parsedResult.items.length} artículos)`, 'success');
+
+      } catch (err) {
+        console.error('Error al procesar ticket OCR:', err);
+        loadingState.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        showToast('Error procesando ticket: ' + (err.message || 'Comprueba tu API Key'), 'error');
+      }
+    }
+
+    // --- 13. FUZZY MATCHING (LEVENSHTEIN & TOKEN SIMILARITY) ---
+    function normalizeText(str) {
+      if (!str) return '';
+      return str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // eliminar tildes
+        .replace(/[^a-z0-9\s]/g, " ")     // solo alfanumérico
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function levenshteinDistance(s1, s2) {
+      const a = s1.length;
+      const b = s2.length;
+      if (a === 0) return b;
+      if (b === 0) return a;
+
+      const matrix = [];
+      for (let i = 0; i <= b; i++) matrix[i] = [i];
+      for (let j = 0; j <= a; j++) matrix[0][j] = j;
+
+      for (let i = 1; i <= b; i++) {
+        for (let j = 1; j <= a; j++) {
+          if (s2.charAt(i - 1) === s1.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1, // sustitución
+              matrix[i][j - 1] + 1,     // inserción
+              matrix[i - 1][j] + 1      // borrado
+            );
+          }
+        }
+      }
+      return matrix[b][a];
+    }
+
+    function similarityScore(str1, str2) {
+      const s1 = normalizeText(str1);
+      const s2 = normalizeText(str2);
+
+      if (s1 === s2) return 1.0;
+      if (!s1 || !s2) return 0.0;
+
+      // Substring check directo
+      if (s1.includes(s2) || s2.includes(s1)) {
+        const ratio = Math.min(s1.length, s2.length) / Math.max(s1.length, s2.length);
+        return Math.max(0.75, ratio);
+      }
+
+      // Token overlap (Jaccard)
+      const tokens1 = new Set(s1.split(' ').filter(t => t.length > 2));
+      const tokens2 = new Set(s2.split(' ').filter(t => t.length > 2));
+      const intersection = new Set([...tokens1].filter(x => tokens2.has(x)));
+      if (intersection.size > 0) {
+        const union = new Set([...tokens1, ...tokens2]);
+        const jaccard = intersection.size / union.size;
+        if (jaccard >= 0.5) return 0.7 + (jaccard * 0.3);
+      }
+
+      // Levenshtein normalizado
+      const maxLen = Math.max(s1.length, s2.length);
+      const dist = levenshteinDistance(s1, s2);
+      return Math.max(0, 1 - (dist / maxLen));
+    }
+
+    function matchOcrWithShoppingList(ocrResult) {
+      const matchedItems = [];
+      let totalMatches = 0;
+
+      ocrResult.items.forEach((item, index) => {
+        let bestMatch = null;
+        let highestScore = 0;
+
+        // Comparar con cada ítem de la lista activa
+        state.items.forEach(listItem => {
+          // Evaluar tanto contra el rawName como contra cleanName
+          const scoreRaw = similarityScore(item.rawName, listItem.name);
+          const scoreClean = similarityScore(item.cleanName, listItem.name);
+          const score = Math.max(scoreRaw, scoreClean);
+
+          if (score > highestScore && score >= 0.55) {
+            highestScore = score;
+            bestMatch = listItem;
+          }
+        });
+
+        if (bestMatch) totalMatches++;
+
+        matchedItems.push({
+          id: 'ocr_' + index,
+          rawName: item.rawName,
+          cleanName: item.cleanName || item.rawName,
+          quantity: item.quantity || 1,
+          unitPrice: parseFloat(item.unitPrice) || 0,
+          totalPrice: parseFloat(item.totalPrice) || 0,
+          matchedListItem: bestMatch,
+          similarity: highestScore,
+          selected: true // preseleccionado para aplicar
+        });
+      });
+
+      return {
+        supermarket: ocrResult.supermarket || 'Supermercado',
+        date: ocrResult.date || new Date().toISOString().split('T')[0],
+        total: parseFloat(ocrResult.total) || 0,
+        items: matchedItems,
+        totalMatches: totalMatches
+      };
+    }
+
+    function renderOcrResults(ocrData) {
+      document.getElementById('ocr-detected-market').textContent = ocrData.supermarket;
+      document.getElementById('ocr-detected-date').textContent = ocrData.date;
+      document.getElementById('ocr-detected-total').textContent = `${ocrData.total.toFixed(2)} €`;
+      document.getElementById('ocr-matched-count').textContent = `${ocrData.totalMatches} coincidencias con tu lista`;
+
+      const listContainer = document.getElementById('ocr-items-list');
+      listContainer.innerHTML = '';
+
+      ocrData.items.forEach(item => {
+        const isMatched = !!item.matchedListItem;
+        const matchPercent = Math.round(item.similarity * 100);
+
+        const row = document.createElement('div');
+        row.className = `p-2.5 rounded-xl border flex items-center justify-between gap-3 text-xs transition ${
+          isMatched ? 'bg-emerald-50/40 border-emerald-200' : 'bg-slate-50 border-slate-200'
+        }`;
+
+        row.innerHTML = `
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            <input type="checkbox" id="chk-${item.id}" ${item.selected ? 'checked' : ''} 
+              class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-slate-800 truncate">${escapeHtml(item.cleanName)}</span>
+                <span class="text-[10px] text-slate-400 font-mono">(${item.quantity} x ${item.unitPrice.toFixed(2)}€)</span>
+              </div>
+              <div class="text-[11px] text-slate-500 truncate mt-0.5">
+                Ticket: <span class="italic text-slate-400">"${escapeHtml(item.rawName)}"</span>
+                ${isMatched ? `
+                  <span class="ml-1 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.2 rounded-md">
+                    <i class="fa-solid fa-link text-[8px]"></i> Cruza con: "${escapeHtml(item.matchedListItem.name)}" (${matchPercent}%)
+                  </span>
+                ` : `
+                  <span class="ml-1 inline-flex items-center text-[10px] text-slate-400 font-medium">
+                    (Nuevo producto)
+                  </span>
+                `}
+              </div>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="font-bold text-slate-900 block">${item.totalPrice.toFixed(2)} €</span>
+          </div>
+        `;
+
+        row.querySelector(`#chk-${item.id}`).addEventListener('change', (e) => {
+          item.selected = e.target.checked;
+        });
+
+        listContainer.appendChild(row);
+      });
+    }
+
+    function applyOcrToApp() {
+      if (!currentOcrData) return;
+
+      let matchedUpdated = 0;
+      let pricesRecorded = 0;
+
+      // 1. Identificar o crear supermercado detectado si no existe
+      let targetSupermarketId = state.activeSupermarketId;
+      const detectedNameLower = normalizeText(currentOcrData.supermarket);
+      const foundMarket = state.supermarkets.find(s => normalizeText(s.name) === detectedNameLower || detectedNameLower.includes(normalizeText(s.name)));
+      
+      if (foundMarket) {
+        targetSupermarketId = foundMarket.id;
+      } else if (currentOcrData.supermarket && currentOcrData.supermarket !== 'Supermercado') {
+        const newSuperId = 'sup_' + Date.now();
+        state.supermarkets.push({ id: newSuperId, name: currentOcrData.supermarket });
+        targetSupermarketId = newSuperId;
+        renderSupermarketSelect();
+      }
+
+      state.activeSupermarketId = targetSupermarketId;
+      document.getElementById('select-supermarket').value = targetSupermarketId;
+
+      // 2. Procesar artículos seleccionados
+      currentOcrData.items.forEach(ocrItem => {
+        if (!ocrItem.selected) return;
+
+        // Registrar precio histórico
+        if (ocrItem.unitPrice > 0) {
+          state.pricesHistory.push({
+            id: 'ph_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            itemName: ocrItem.cleanName,
+            supermarketId: targetSupermarketId,
+            price: ocrItem.unitPrice,
+            date: currentOcrData.date,
+            source: 'ocr'
+          });
+          pricesRecorded++;
+        }
+
+        // Cruzar y marcar como completado en la lista de la compra
+        if (ocrItem.matchedListItem) {
+          const listItem = state.items.find(i => i.id === ocrItem.matchedListItem.id);
+          if (listItem) {
+            listItem.checked = true; // Marcado como comprado!
+            matchedUpdated++;
+          }
+        }
+      });
+
+      saveState();
+      renderShoppingList();
+      updateEstimatedTotal();
+      closeOcrModal();
+
+      showToast(`¡Actualizado! ${matchedUpdated} comprados y ${pricesRecorded} precios guardados.`, 'success');
+    }
+
+    // --- 14. GESTIÓN DEL HISTORIAL DE PRECIOS ---
+    function renderPricesHistory(searchTerm = '') {
+      const container = document.getElementById('history-items-container');
+      const normFilter = normalizeText(searchTerm);
+
+      if (state.pricesHistory.length === 0) {
+        container.innerHTML = `
+          <div class="py-10 text-center text-slate-400">
+            <i class="fa-solid fa-receipt text-2xl mb-2"></i>
+            <p>Aún no hay precios registrados.</p>
+            <p class="text-[11px] mt-1">Escanea tickets para guardar automáticamente el histórico de precios de cada supermercado.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Agrupar por producto y luego por supermercado
+      const grouped = {};
+      state.pricesHistory.forEach(record => {
+        const pName = capitalize(record.itemName);
+        if (!grouped[pName]) grouped[pName] = [];
+        grouped[pName].push(record);
+      });
+
+      let html = '';
+      const sortedKeys = Object.keys(grouped).sort();
+
+      sortedKeys.forEach(pName => {
+        if (normFilter && !normalizeText(pName).includes(normFilter)) return;
+
+        const records = grouped[pName];
+        
+        // Obtener el precio más reciente por cada supermercado
+        const bySuper = {};
+        records.forEach(r => {
+          if (!bySuper[r.supermarketId] || new Date(r.date) > new Date(bySuper[r.supermarketId].date)) {
+            bySuper[r.supermarketId] = r;
+          }
+        });
+
+        html += `
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-slate-800 text-xs">${escapeHtml(pName)}</span>
+              <span class="text-[10px] text-slate-400">${records.length} registros</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              ${Object.entries(bySuper).map(([superId, rec]) => {
+                const superName = state.supermarkets.find(s => s.id === superId)?.name || 'General';
+                return `
+                  <div class="bg-white p-2 rounded-lg border border-slate-100 flex items-center justify-between">
+                    <div>
+                      <span class="text-[10px] text-slate-500 font-medium block truncate">${escapeHtml(superName)}</span>
+                      <span class="text-[9px] text-slate-400">${rec.date}</span>
+                    </div>
+                    <span class="font-bold text-xs text-brand-700">${rec.price.toFixed(2)} €</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      if (!html) {
+        container.innerHTML = `<p class="text-center py-6 text-slate-400">No se encontraron productos coincidentes.</p>`;
+      } else {
+        container.innerHTML = html;
+      }
+    }
+
+    // --- 15. COPIAS DE SEGURIDAD (IMPORT / EXPORT JSON) ---
+    function exportDatabase() {
+      const backupData = {
+        app: 'TuCompra AI',
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        items: state.items,
+        supermarkets: state.supermarkets,
+        pricesHistory: state.pricesHistory,
+        config: {
+          aiProvider: state.config.aiProvider,
+          geminiModel: state.config.geminiModel,
+          openaiModel: state.config.openaiModel
+          // Por seguridad NO exportamos la API Key en el JSON compartido
+        }
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const dateStr = new Date().toISOString().split('T')[0];
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `tucompra-backup-${dateStr}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast('Copia de seguridad descargada', 'success');
+    }
+
+    function importDatabase(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!imported.items && !imported.pricesHistory) {
+            throw new Error('Formato de archivo inválido');
+          }
+
+          if (confirm('¿Deseas reemplazar tus datos actuales con los de la copia de seguridad?')) {
+            if (Array.isArray(imported.items)) state.items = imported.items;
+            if (Array.isArray(imported.supermarkets)) state.supermarkets = imported.supermarkets;
+            if (Array.isArray(imported.pricesHistory)) state.pricesHistory = imported.pricesHistory;
+
+            saveState();
+            renderSupermarketSelect();
+            renderShoppingList();
+            updateEstimatedTotal();
+            showToast('¡Datos importados correctamente!', 'success');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Error al importar archivo JSON: ' + err.message, 'error');
+        }
+        event.target.value = ''; // limpiar input
+      };
+      reader.readAsText(file);
+    }
+
+    // --- 16. CONFIGURACIÓN Y TEST DE CONEXIÓN CON LLM ---
+    function openConfigModal() {
+      const modal = document.getElementById('modal-config');
+      const keyInput = document.getElementById('input-api-key');
+      const providerRadios = document.getElementsByName('ai-provider');
+      const modelSelect = document.getElementById('select-ai-model');
+
+      keyInput.value = state.config.apiKey || '';
+      for (const r of providerRadios) {
+        if (r.value === state.config.aiProvider) r.checked = true;
+      }
+      updateModelOptions(state.config.aiProvider);
+      document.getElementById('test-connection-result').classList.add('hidden');
+      modal.classList.remove('hidden');
+    }
+
+    function closeConfigModal() {
+      document.getElementById('modal-config').classList.add('hidden');
+    }
+
+    function updateModelOptions(provider) {
+      const select = document.getElementById('select-ai-model');
+      const linkKey = document.getElementById('link-get-key');
+      select.innerHTML = '';
+
+      if (provider === 'gemini') {
+        linkKey.href = 'https://aistudio.google.com/app/apikey';
+        linkKey.querySelector('span').textContent = 'Obtener clave de Google AI Studio (Gratis)';
+        select.innerHTML = `
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash (Rápido y Óptimo)</option>
+          <option value="gemini-2.0-flash">Gemini 2.0 Flash (Más reciente)</option>
+        `;
+        select.value = state.config.geminiModel || 'gemini-1.5-flash';
+      } else {
+        linkKey.href = 'https://platform.openai.com/api-keys';
+        linkKey.querySelector('span').textContent = 'Obtener clave de OpenAI Platform';
+        select.innerHTML = `
+          <option value="gpt-4o-mini">GPT-4o Mini (Rápido y Económico)</option>
+          <option value="gpt-4o">GPT-4o (Máxima precisión)</option>
+        `;
+        select.value = state.config.openaiModel || 'gpt-4o-mini';
+      }
+    }
+
+    async function testAiConnection() {
+      const keyInput = document.getElementById('input-api-key').value.trim();
+      const provider = document.querySelector('input[name="ai-provider"]:checked')?.value || 'gemini';
+      const model = document.getElementById('select-ai-model').value;
+      const resultBox = document.getElementById('test-connection-result');
+
+      if (!keyInput) {
+        resultBox.className = 'mt-2 p-2 rounded-lg text-xs font-medium text-center bg-rose-50 text-rose-700 border border-rose-200';
+        resultBox.textContent = 'Introduce una clave antes de probar.';
+        resultBox.classList.remove('hidden');
+        return;
+      }
+
+      resultBox.className = 'mt-2 p-2 rounded-lg text-xs font-medium text-center bg-slate-100 text-slate-700';
+      resultBox.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-1"></i> Conectando con ' + provider + '...';
+      resultBox.classList.remove('hidden');
+
+      try {
+        if (provider === 'gemini') {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyInput}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: 'Hola' }] }]
+            })
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error?.message || `Código HTTP ${res.status}`);
+          }
+        } else {
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${keyInput}`
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [{ role: 'user', content: 'Hola' }],
+              max_tokens: 5
+            })
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error?.message || `Código HTTP ${res.status}`);
+          }
+        }
+
+        resultBox.className = 'mt-2 p-2 rounded-lg text-xs font-medium text-center bg-emerald-50 text-emerald-800 border border-emerald-200';
+        resultBox.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> ¡Conexión exitosa!';
+      } catch (err) {
+        resultBox.className = 'mt-2 p-2 rounded-lg text-xs font-medium text-center bg-rose-50 text-rose-800 border border-rose-200';
+        resultBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Error: ${err.message}`;
+      }
+    }
+
+    function saveConfig(e) {
+      e.preventDefault();
+      const provider = document.querySelector('input[name="ai-provider"]:checked')?.value || 'gemini';
+      const key = document.getElementById('input-api-key').value.trim();
+      const model = document.getElementById('select-ai-model').value;
+
+      state.config.aiProvider = provider;
+      state.config.apiKey = key;
+      if (provider === 'gemini') {
+        state.config.geminiModel = model;
+      } else {
+        state.config.openaiModel = model;
+      }
+
+      saveState();
+      checkApiKeyBadge();
+      closeConfigModal();
+      showToast('Configuración guardada en tu navegador', 'success');
+    }
+
+    // --- 17. MODAL OCR ACCIONES ---
+    function openOcrModal() {
+      currentOcrData = null;
+      document.getElementById('input-ticket-file').value = '';
+      document.getElementById('ocr-upload-zone').classList.remove('hidden');
+      document.getElementById('ocr-preview-container').classList.add('hidden');
+      document.getElementById('ocr-loading-state').classList.add('hidden');
+      document.getElementById('ocr-results-container').classList.add('hidden');
+      document.getElementById('ocr-footer-actions').classList.add('hidden');
+      document.getElementById('modal-ocr').classList.remove('hidden');
+    }
+
+    function closeOcrModal() {
+      document.getElementById('modal-ocr').classList.add('hidden');
+    }
+
+    // --- 18. MODAL HISTORIAL ACCIONES ---
+    function openHistoryModal() {
+      document.getElementById('input-search-history').value = '';
+      renderPricesHistory();
+      document.getElementById('modal-history').classList.remove('hidden');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('modal-history').classList.add('hidden');
+    }
+
+    // --- 19. MODAL AÑADIR SUPERMERCADO ---
+    function openAddSupermarketModal() {
+      document.getElementById('input-new-supermarket-name').value = '';
+      document.getElementById('modal-add-supermarket').classList.remove('hidden');
+    }
+
+    function closeAddSupermarketModal() {
+      document.getElementById('modal-add-supermarket').classList.add('hidden');
+    }
+
+    function confirmAddSupermarket() {
+      const input = document.getElementById('input-new-supermarket-name');
+      const name = input.value.trim();
+      if (!name) return;
+
+      const newId = 'sup_' + Date.now();
+      state.supermarkets.push({ id: newId, name: name });
+      state.activeSupermarketId = newId;
+
+      saveState();
+      renderSupermarketSelect();
+      updateEstimatedTotal();
+      closeAddSupermarketModal();
+      showToast(`Supermercado "${name}" añadido`, 'success');
+    }
+
+    // --- 19.5 MODAL PRECIO MANUAL ACCIONES ---
+    function openEditPriceModal(itemId = null, defaultName = '') {
+      const modal = document.getElementById('modal-edit-price');
+      const selectSuper = document.getElementById('edit-price-supermarket');
+      const nameGroup = document.getElementById('group-edit-price-name');
+      const nameInput = document.getElementById('input-manual-price-name');
+      const priceInput = document.getElementById('input-manual-price-value');
+      const titleEl = document.getElementById('edit-price-item-title');
+      const subEl = document.getElementById('edit-price-item-subtitle');
+      const idInput = document.getElementById('edit-price-item-id');
+
+      // Llenar selector de supermercados
+      selectSuper.innerHTML = '';
+      state.supermarkets.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        if (s.id === state.activeSupermarketId) opt.selected = true;
+        selectSuper.appendChild(opt);
+      });
+
+      if (itemId) {
+        const item = state.items.find(i => i.id === itemId);
+        if (!item) return;
+        idInput.value = item.id;
+        nameGroup.classList.add('hidden');
+        titleEl.textContent = item.name;
+        subEl.textContent = `Precio unitario para ${item.quantity} ${item.unit || 'ud.'}`;
+
+        const existingPrice = getEstimatedPriceForItem(item.name, state.activeSupermarketId);
+        priceInput.value = existingPrice > 0 ? existingPrice.toFixed(2) : '';
+      } else {
+        // Modo desde historial (crear o actualizar precio de un producto libre)
+        idInput.value = '';
+        nameGroup.classList.remove('hidden');
+        nameInput.value = defaultName;
+        titleEl.textContent = 'Nuevo Precio en Historial';
+        subEl.textContent = 'Introduce producto y precio para comparar';
+        priceInput.value = '';
+      }
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        if (itemId) {
+          priceInput.focus();
+          priceInput.select();
+        } else {
+          nameInput.focus();
+        }
+      }, 150);
+    }
+
+    function closeEditPriceModal() {
+      document.getElementById('modal-edit-price').classList.add('hidden');
+    }
+
+    function handleSaveManualPrice(e) {
+      if (e) e.preventDefault();
+      const idInput = document.getElementById('edit-price-item-id').value;
+      const selectSuper = document.getElementById('edit-price-supermarket').value;
+      const priceVal = parseFloat(document.getElementById('input-manual-price-value').value);
+
+      if (isNaN(priceVal) || priceVal <= 0) {
+        showToast('Introduce un precio válido mayor a 0', 'warning');
+        return;
+      }
+
+      let productName = '';
+      if (idInput) {
+        const item = state.items.find(i => i.id === idInput);
+        if (item) productName = item.name;
+      } else {
+        productName = document.getElementById('input-manual-price-name').value.trim();
+      }
+
+      if (!productName) {
+        showToast('Indica el nombre del producto', 'warning');
+        return;
+      }
+
+      // Guardar en pricesHistory
+      const today = new Date().toISOString().split('T')[0];
+      state.pricesHistory.push({
+        id: 'ph_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        itemName: productName,
+        supermarketId: selectSuper,
+        price: priceVal,
+        date: today,
+        source: 'manual'
+      });
+
+      saveState();
+      renderShoppingList();
+      updateEstimatedTotal();
+      if (!document.getElementById('modal-history').classList.contains('hidden')) {
+        renderPricesHistory();
+      }
+      closeEditPriceModal();
+
+      const superName = state.supermarkets.find(s => s.id === selectSuper)?.name || 'supermercado';
+      showToast(`Precio guardado: ${productName} a ${priceVal.toFixed(2)}€ en ${superName}`, 'success');
+    }
+
+    // --- 20. UTILIDADES Y HELPERS ---
+    function focusAddInput() {
+      const input = document.getElementById('input-item-name');
+      if (input) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => input.focus(), 200);
+      }
+    }
+
+    function showAiLoading(show, title = '', subtitle = '') {
+      const el = document.getElementById('ai-loading-indicator');
+      if (show) {
+        document.getElementById('ai-loading-text').textContent = title;
+        document.getElementById('ai-loading-subtext').textContent = subtitle;
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const icons = {
+        success: 'fa-circle-check text-emerald-500',
+        error: 'fa-triangle-exclamation text-rose-500',
+        warning: 'fa-circle-exclamation text-amber-500',
+        info: 'fa-circle-info text-blue-500'
+      };
+
+      toast.className = `p-3.5 rounded-2xl bg-white shadow-apple-hover border border-slate-200/80 flex items-center gap-3 text-xs font-semibold text-slate-800 transform transition-all duration-300 translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icons[type] || icons.info} text-base flex-shrink-0"></i>
+        <span class="flex-1">${escapeHtml(message)}</span>
+      `;
+
+      container.appendChild(toast);
+
+      // Trigger animation
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function capitalize(str) {
+      if (!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function getCategoryName(catId) {
+      const cat = CATEGORIES.find(c => c.id === catId);
+      return cat ? cat.name : 'Otros';
+    }
+
+    function cleanJsonString(str) {
+      return str.replace(/```json\n?|\n?```/g, '').trim();
+    }
+
+    // Carga de lista de ejemplo para demostración rápida
+    function loadSampleData() {
+      state.items = [
+        { id: '1', name: 'Manzanas Golden', category: 'frutas-verduras', quantity: 1, unit: 'kg', checked: false, isAiClassified: true, addedAt: new Date().toISOString() },
+        { id: '2', name: 'Pechuga de pollo', category: 'carnes-pescados', quantity: 500, unit: 'g', checked: false, isAiClassified: true, addedAt: new Date().toISOString() },
+        { id: '3', name: 'Leche entera', category: 'lacteos-huevos', quantity: 2, unit: 'ud.', checked: false, isAiClassified: true, addedAt: new Date().toISOString() },
+        { id: '4', name: 'Huevos Camperos', category: 'lacteos-huevos', quantity: 1, unit: 'docena', checked: false, isAiClassified: true, addedAt: new Date().toISOString() },
+        { id: '5', name: 'Pan de hogaza', category: 'panaderia', quantity: 1, unit: 'ud.', checked: false, isAiClassified: false, addedAt: new Date().toISOString() },
+        { id: '6', name: 'Detergente líquido', category: 'limpieza-hogar', quantity: 1, unit: 'pack', checked: false, isAiClassified: true, addedAt: new Date().toISOString() },
+      ];
+
+      // Añadir precios de ejemplo
+      state.pricesHistory = [
+        { id: 'p1', itemName: 'Leche entera', supermarketId: 'mercadona', price: 1.15, date: '2026-10-10', source: 'manual' },
+        { id: 'p2', itemName: 'Huevos Camperos', supermarketId: 'mercadona', price: 2.30, date: '2026-10-10', source: 'manual' },
+        { id: 'p3', itemName: 'Pechuga de pollo', supermarketId: 'mercadona', price: 3.85, date: '2026-10-10', source: 'manual' },
+        { id: 'p4', itemName: 'Manzanas Golden', supermarketId: 'mercadona', price: 1.89, date: '2026-10-10', source: 'manual' },
+      ];
+
+      saveState();
+      renderShoppingList();
+      showToast('Lista de prueba cargada', 'success');
+    }
+
+    // --- 21. CONFIGURACIÓN DE EVENT LISTENERS ---
+    function setupEventListeners() {
+      // Formulario Añadir Ítem
+      document.getElementById('form-add-item').addEventListener('submit', handleAddItem);
+
+      // Botones +/- de Cantidad
+      const qtyInput = document.getElementById('input-item-qty');
+      document.getElementById('btn-qty-minus').addEventListener('click', () => {
+        let val = parseInt(qtyInput.value) || 1;
+        if (val > 1) qtyInput.value = val - 1;
+      });
+      document.getElementById('btn-qty-plus').addEventListener('click', () => {
+        let val = parseInt(qtyInput.value) || 1;
+        qtyInput.value = val + 1;
+      });
+
+      // Limpiar input de texto
+      const itemNameInput = document.getElementById('input-item-name');
+      const clearInputBtn = document.getElementById('btn-clear-input');
+      itemNameInput.addEventListener('input', () => {
+        if (itemNameInput.value.length > 0) {
+          clearInputBtn.classList.remove('hidden');
+        } else {
+          clearInputBtn.classList.add('hidden');
+        }
+      });
+      clearInputBtn.addEventListener('click', () => {
+        itemNameInput.value = '';
+        clearInputBtn.classList.add('hidden');
+        itemNameInput.focus();
+      });
+
+      // Cambio de Supermercado Activo
+      document.getElementById('select-supermarket').addEventListener('change', (e) => {
+        state.activeSupermarketId = e.target.value;
+        saveState();
+        renderShoppingList();
+        showToast(`Supermercado activo: ${e.target.options[e.target.selectedIndex].text}`, 'info');
+      });
+
+      // Modales: Abrir y Cerrar
+      document.getElementById('btn-open-config').addEventListener('click', openConfigModal);
+      document.getElementById('btn-close-config').addEventListener('click', closeConfigModal);
+      document.getElementById('btn-cancel-config').addEventListener('click', closeConfigModal);
+      document.getElementById('form-config').addEventListener('submit', saveConfig);
+
+      // Visibilidad de API Key
+      document.getElementById('btn-toggle-key-visibility').addEventListener('click', () => {
+        const inp = document.getElementById('input-api-key');
+        const icon = document.querySelector('#btn-toggle-key-visibility i');
+        if (inp.type === 'password') {
+          inp.type = 'text';
+          icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+          inp.type = 'password';
+          icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+      });
+
+      // Cambio de proveedor en configuración
+      document.querySelectorAll('input[name="ai-provider"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          updateModelOptions(e.target.value);
+        });
+      });
+
+      // Test de conexión con LLM
+      document.getElementById('btn-test-connection').addEventListener('click', testAiConnection);
+
+      // OCR Modal
+      document.getElementById('btn-open-ocr').addEventListener('click', openOcrModal);
+      document.getElementById('btn-close-ocr').addEventListener('click', closeOcrModal);
+      document.getElementById('ocr-upload-zone').addEventListener('click', () => {
+        document.getElementById('input-ticket-file').click();
+      });
+      document.getElementById('input-ticket-file').addEventListener('change', handleTicketFileSelect);
+      document.getElementById('btn-ocr-retake').addEventListener('click', () => {
+        document.getElementById('input-ticket-file').click();
+      });
+      document.getElementById('btn-process-ocr').addEventListener('click', processTicketOCR);
+      document.getElementById('btn-cancel-ocr-review').addEventListener('click', closeOcrModal);
+      document.getElementById('btn-apply-ocr').addEventListener('click', applyOcrToApp);
+      document.getElementById('btn-toggle-all-ocr').addEventListener('click', () => {
+        if (!currentOcrData) return;
+        const allChecked = currentOcrData.items.every(i => i.selected);
+        currentOcrData.items.forEach(i => i.selected = !allChecked);
+        renderOcrResults(currentOcrData);
+      });
+
+      // Historial Modal & Precio Manual
+      document.getElementById('btn-open-history').addEventListener('click', openHistoryModal);
+      document.getElementById('btn-close-history').addEventListener('click', closeHistoryModal);
+      document.getElementById('input-search-history').addEventListener('input', (e) => {
+        renderPricesHistory(e.target.value);
+      });
+      document.getElementById('btn-add-price-manual-from-history').addEventListener('click', () => {
+        openEditPriceModal(null);
+      });
+
+      // Formulario Editar / Guardar Precio Manual
+      document.getElementById('form-edit-price').addEventListener('submit', handleSaveManualPrice);
+
+      // Añadir Supermercado Modal
+      document.getElementById('btn-add-supermarket').addEventListener('click', openAddSupermarketModal);
+      document.getElementById('btn-cancel-add-supermarket').addEventListener('click', closeAddSupermarketModal);
+      document.getElementById('btn-confirm-add-supermarket').addEventListener('click', confirmAddSupermarket);
+
+      // Acciones inferiores
+      document.getElementById('btn-clear-completed').addEventListener('click', () => {
+        const completedCount = state.items.filter(i => i.checked).length;
+        if (completedCount === 0) {
+          showToast('No hay productos comprados para borrar', 'info');
+          return;
+        }
+        if (confirm(`¿Borrar los ${completedCount} productos marcados como comprados?`)) {
+          state.items = state.items.filter(i => !i.checked);
+          saveState();
+          renderShoppingList();
+          showToast('Productos comprados eliminados', 'success');
+        }
+      });
+
+      document.getElementById('btn-clear-all').addEventListener('click', () => {
+        if (state.items.length === 0) return;
+        if (confirm('¿Vaciar toda la lista de la compra?')) {
+          state.items = [];
+          saveState();
+          renderShoppingList();
+          showToast('Lista vaciada', 'info');
+        }
+      });
+
+      document.getElementById('btn-export-data').addEventListener('click', exportDatabase);
+      document.getElementById('input-import-data').addEventListener('change', importDatabase);
+      document.getElementById('btn-quick-sample').addEventListener('click', loadSampleData);
+    }
+
+    // Iniciar al cargar el DOM
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
