@@ -686,7 +686,7 @@
               <i class="fa-solid fa-minus"></i>
             </button>
             <div class="relative flex-1">
-              <input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" id="input-edit-quantity-val" required
+              <input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" id="input-edit-quantity-val" required autofocus
                 class="w-full text-center py-2.5 text-2xl font-black text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none">
             </div>
             <button type="button" id="btn-modal-qty-plus" class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-base flex items-center justify-center active:scale-95 transition">
@@ -1411,13 +1411,11 @@
       updateUnitChipsUI(currentUnit);
 
       modal.classList.remove('hidden');
-      setTimeout(() => {
-        const inp = document.getElementById('input-edit-quantity-val');
-        if (inp) {
-          inp.focus();
-          inp.select();
-        }
-      }, 150);
+      const inp = document.getElementById('input-edit-quantity-val');
+      if (inp) {
+        inp.focus();
+        inp.select();
+      }
     }
 
     function closeEditQuantityModal() {
@@ -2433,14 +2431,12 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
       }
 
       modal.classList.remove('hidden');
-      setTimeout(() => {
-        if (itemId) {
-          priceInput.focus();
-          priceInput.select();
-        } else {
-          nameInput.focus();
-        }
-      }, 150);
+      if (itemId) {
+        priceInput.focus();
+        priceInput.select();
+      } else {
+        nameInput.focus();
+      }
     }
 
     function closeEditPriceModal() {
