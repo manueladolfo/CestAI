@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <!-- Meta PWA & Responsive Viewport con safe-area para iPhone y Android -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
   <title>CestAI - Tu Cesta Inteligente con IA</title>
   
   <meta name="theme-color" content="#059669">
@@ -598,8 +598,8 @@
   </div>
 
   <!-- ==================== MODAL EDITAR / AÑADIR PRECIO MANUAL ==================== -->
-  <div id="modal-edit-price" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-4">
+  <div id="modal-edit-price" onclick="if (event.target === this) closeEditPriceModal()" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div id="modal-edit-price-card" class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-4 transition-transform duration-200 ease-out will-change-transform">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm shadow-sm">
@@ -658,8 +658,8 @@
   </div>
 
   <!-- ==================== MODAL EDITAR CANTIDAD Y UNIDAD ==================== -->
-  <div id="modal-edit-quantity" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-4">
+  <div id="modal-edit-quantity" onclick="if (event.target === this) closeEditQuantityModal()" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div id="modal-edit-quantity-card" class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-4 transition-transform duration-200 ease-out will-change-transform">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-sm shadow-sm">
@@ -721,8 +721,8 @@
   </div>
 
   <!-- ==================== MODAL AÑADIR SUPERMERCADO ==================== -->
-  <div id="modal-add-supermarket" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-xs rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-3">
+  <div id="modal-add-supermarket" onclick="if (event.target === this) closeAddSupermarketModal()" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div id="modal-add-supermarket-card" class="bg-white w-full max-w-xs rounded-2xl shadow-2xl border border-slate-100 p-5 space-y-3 transition-transform duration-200 ease-out will-change-transform">
       <h3 class="font-bold text-sm text-slate-800">Nuevo Supermercado</h3>
       <input type="text" id="input-new-supermarket-name" placeholder="Ej: Eroski, Ahorramas..." 
         class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-500">
@@ -1411,15 +1411,25 @@
       updateUnitChipsUI(currentUnit);
 
       modal.classList.remove('hidden');
+      const card = document.getElementById('modal-edit-quantity-card');
+      if (card) card.style.transform = '';
+
       const inp = document.getElementById('input-edit-quantity-val');
       if (inp) {
         inp.focus();
         inp.select();
       }
+      if (typeof adjustActiveModalForKeyboard === 'function') {
+        setTimeout(adjustActiveModalForKeyboard, 60);
+        setTimeout(adjustActiveModalForKeyboard, 250);
+      }
     }
 
     function closeEditQuantityModal() {
-      document.getElementById('modal-edit-quantity').classList.add('hidden');
+      const modal = document.getElementById('modal-edit-quantity');
+      if (modal) modal.classList.add('hidden');
+      const card = document.getElementById('modal-edit-quantity-card');
+      if (card) card.style.transform = '';
     }
 
     function updateUnitChipsUI(selectedUnit) {
@@ -2366,11 +2376,23 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
     // --- 19. MODAL AÑADIR SUPERMERCADO ---
     function openAddSupermarketModal() {
       document.getElementById('input-new-supermarket-name').value = '';
-      document.getElementById('modal-add-supermarket').classList.remove('hidden');
+      const modal = document.getElementById('modal-add-supermarket');
+      modal.classList.remove('hidden');
+      const card = document.getElementById('modal-add-supermarket-card');
+      if (card) card.style.transform = '';
+      const input = document.getElementById('input-new-supermarket-name');
+      if (input) input.focus();
+      if (typeof adjustActiveModalForKeyboard === 'function') {
+        setTimeout(adjustActiveModalForKeyboard, 60);
+        setTimeout(adjustActiveModalForKeyboard, 250);
+      }
     }
 
     function closeAddSupermarketModal() {
-      document.getElementById('modal-add-supermarket').classList.add('hidden');
+      const modal = document.getElementById('modal-add-supermarket');
+      if (modal) modal.classList.add('hidden');
+      const card = document.getElementById('modal-add-supermarket-card');
+      if (card) card.style.transform = '';
     }
 
     function confirmAddSupermarket() {
@@ -2431,16 +2453,26 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
       }
 
       modal.classList.remove('hidden');
+      const card = document.getElementById('modal-edit-price-card');
+      if (card) card.style.transform = '';
+
       if (itemId) {
         priceInput.focus();
         priceInput.select();
       } else {
         nameInput.focus();
       }
+      if (typeof adjustActiveModalForKeyboard === 'function') {
+        setTimeout(adjustActiveModalForKeyboard, 60);
+        setTimeout(adjustActiveModalForKeyboard, 250);
+      }
     }
 
     function closeEditPriceModal() {
-      document.getElementById('modal-edit-price').classList.add('hidden');
+      const modal = document.getElementById('modal-edit-price');
+      if (modal) modal.classList.add('hidden');
+      const card = document.getElementById('modal-edit-price-card');
+      if (card) card.style.transform = '';
     }
 
     function handleSaveManualPrice(e) {
@@ -2788,6 +2820,87 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
           if (e.key === 'ArrowLeft') prevTourStep();
           if (e.key === 'Escape') closeTourModal();
         }
+      });
+
+      // Sistema de reposicionamiento dinámico de modales al desplegarse el teclado
+      setupModalKeyboardAvoidance();
+    }
+
+    // ==================== REPOSICIONAMIENTO DINÁMICO DE MODALES CON TECLADO VIRTUAL ====================
+    let adjustActiveModalForKeyboard = null;
+
+    function setupModalKeyboardAvoidance() {
+      const modalConfigs = [
+        { modalId: 'modal-edit-quantity', cardId: 'modal-edit-quantity-card', inputIds: ['input-edit-quantity-val'] },
+        { modalId: 'modal-edit-price', cardId: 'modal-edit-price-card', inputIds: ['input-manual-price-value', 'input-manual-price-name'] },
+        { modalId: 'modal-add-supermarket', cardId: 'modal-add-supermarket-card', inputIds: ['input-new-supermarket-name'] }
+      ];
+
+      adjustActiveModalForKeyboard = function() {
+        modalConfigs.forEach(({ modalId, cardId, inputIds }) => {
+          const modal = document.getElementById(modalId);
+          const card = document.getElementById(cardId);
+          if (!modal || !card || modal.classList.contains('hidden')) return;
+
+          let isKeyboardUp = false;
+          let shift = 0;
+
+          // 1. Detección con Visual Viewport (iOS Safari, Android Chrome y WebKit moderno)
+          if (window.visualViewport) {
+            const vv = window.visualViewport;
+            const keyboardHeight = window.innerHeight - vv.height;
+            if (keyboardHeight > 100) {
+              isKeyboardUp = true;
+              // Centrar matemáticamente la tarjeta en el espacio visible restante sobre el teclado
+              const visualCenter = vv.offsetTop + (vv.height / 2);
+              const layoutCenter = window.innerHeight / 2;
+              shift = visualCenter - layoutCenter;
+            }
+          }
+
+          // 2. Fallback de respuesta rápida en móviles si el foco está activo
+          const activeEl = document.activeElement;
+          const isInputFocused = inputIds.some(id => document.getElementById(id) === activeEl);
+          if (!isKeyboardUp && isInputFocused && window.innerWidth <= 768) {
+            shift = -110; // Desplazamiento preventivo para no tapar los botones
+            isKeyboardUp = true;
+          }
+
+          if (isKeyboardUp && shift !== 0) {
+            // Asegurar que no se salga por arriba ni exceda el espacio disponible
+            const boundedShift = Math.max(Math.min(shift, -20), -240);
+            card.style.transform = `translateY(${boundedShift}px)`;
+          } else {
+            card.style.transform = '';
+          }
+        });
+      };
+
+      // Escuchar eventos del viewport visual (apertura/cierre teclado móvil)
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', adjustActiveModalForKeyboard);
+        window.visualViewport.addEventListener('scroll', adjustActiveModalForKeyboard);
+      }
+
+      // Escuchar eventos focus y blur en los inputs para una respuesta inmediata
+      modalConfigs.forEach(({ cardId, inputIds }) => {
+        const card = document.getElementById(cardId);
+        inputIds.forEach(id => {
+          const inp = document.getElementById(id);
+          if (!inp) return;
+          inp.addEventListener('focus', () => {
+            adjustActiveModalForKeyboard();
+            setTimeout(adjustActiveModalForKeyboard, 80);
+            setTimeout(adjustActiveModalForKeyboard, 250);
+          });
+          inp.addEventListener('blur', () => {
+            setTimeout(() => {
+              if (card && (!window.visualViewport || (window.innerHeight - window.visualViewport.height) < 100)) {
+                card.style.transform = '';
+              }
+            }, 120);
+          });
+        });
       });
     }
 
