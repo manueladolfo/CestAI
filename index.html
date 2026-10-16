@@ -150,17 +150,19 @@
         
         <!-- Selector de Supermercado Activo -->
         <div class="flex items-center gap-1.5 min-w-0">
-          <label for="select-supermarket" class="text-xs text-slate-500 font-medium hidden xs:inline-flex items-center gap-1">
-            <i class="fa-solid fa-store text-slate-400 text-[11px]"></i> Super:
+          <label for="select-supermarket" class="text-xs font-bold text-slate-700 flex items-center gap-1 flex-shrink-0 cursor-pointer">
+            <i class="fa-solid fa-store text-brand-600 text-[11px]"></i>
+            <span>Supermercados:</span>
           </label>
           <div class="relative inline-flex items-center">
             <select id="select-supermarket" 
-              class="appearance-none bg-slate-100 hover:bg-slate-200/80 font-bold text-xs sm:text-sm text-slate-800 py-1.5 pl-2.5 pr-7 rounded-xl border border-slate-200/80 focus:ring-2 focus:ring-brand-500 cursor-pointer transition max-w-[140px] sm:max-w-none truncate">
+              class="appearance-none bg-slate-100 hover:bg-slate-200/80 font-bold text-xs sm:text-sm text-slate-800 py-1.5 pl-2.5 pr-7 rounded-xl border border-slate-200/80 focus:ring-2 focus:ring-brand-500 cursor-pointer transition max-w-[125px] sm:max-w-none truncate shadow-2xs"
+              title="Elegir supermercado activo">
               <!-- Se llena dinámicamente con JS -->
             </select>
             <i class="fa-solid fa-chevron-down text-[10px] text-slate-500 absolute right-2 pointer-events-none"></i>
           </div>
-          <button id="btn-add-supermarket" title="Añadir otro supermercado" class="w-7 h-7 flex items-center justify-center text-xs text-slate-400 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition">
+          <button id="btn-add-supermarket" title="Añadir nuevo supermercado" class="w-7 h-7 flex items-center justify-center text-xs text-slate-500 hover:text-brand-600 bg-slate-100 hover:bg-brand-50 border border-slate-200/70 rounded-lg transition active:scale-90">
             <i class="fa-solid fa-plus"></i>
           </button>
         </div>
@@ -285,6 +287,15 @@
         </label>
       </div>
     </section>
+
+    <!-- ENLACE TOUR GUIADO (ESTILO APP STORE / CAROUSEL) -->
+    <div class="mt-8 mb-2 flex justify-center">
+      <button type="button" onclick="openTourModal(0)" 
+        class="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/60 rounded-2xl shadow-xs transition active:scale-95">
+        <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+        <span>Ver cómo funciona (Tour guiado)</span>
+      </button>
+    </div>
 
   </main>
 
@@ -722,6 +733,81 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL TOUR GUIADO (TIPO APP STORE / CAROUSEL) ==================== -->
+  <div id="modal-tour" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto hidden">
+    <div class="bg-slate-900 text-white w-full max-w-sm sm:max-w-md rounded-3xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col my-auto transition-all transform scale-100">
+      
+      <!-- Cabecera del Tour -->
+      <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-white text-xs sm:text-sm tracking-tight">Tour Guiado de CestAI</h2>
+            <p id="tour-step-counter" class="text-[10px] sm:text-[11px] text-slate-400 font-medium">Paso 1 de 4</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeTourModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition" title="Cerrar tour">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Tarjeta / Diapositiva Deslizable (Soporte Touch Swipe) -->
+      <div id="tour-slide-card" class="p-4 sm:p-5 flex-1 flex flex-col justify-between select-none cursor-grab active:cursor-grabbing">
+        
+        <!-- Contenedor Imagen Captura Real -->
+        <div class="w-full h-44 sm:h-52 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden mb-3.5 relative shadow-inner">
+          <img id="tour-slide-img" src="docs/screenshots/02-lista-principal.png" alt="Captura de la función" 
+            class="w-full h-full object-cover object-top transition-transform duration-300">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
+        </div>
+
+        <!-- Textos y Puntos Clave -->
+        <div>
+          <span id="tour-slide-badge" class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60 mb-1.5">
+            1. ORGANIZACIÓN INTELIGENTE
+          </span>
+          <h3 id="tour-slide-title" class="text-lg sm:text-xl font-black text-white tracking-tight leading-snug">
+            Tu lista organizada automáticamente
+          </h3>
+          <p id="tour-slide-question" class="text-xs font-bold text-teal-400 mt-0.5">
+            ¿Escribir o dictar rápido? La IA lo ordena por ti
+          </p>
+          <p id="tour-slide-desc" class="text-xs text-slate-300 leading-relaxed mt-2">
+            Añade productos en lenguaje natural (ej: "2 kg de tomates, leche sin lactosa, café"). CestAI detecta cantidades, unidades y agrupa cada alimento en su categoría del súper.
+          </p>
+
+          <!-- Tarjetas de Características / Bullets -->
+          <div id="tour-slide-highlights" class="mt-3 p-3 rounded-xl bg-slate-800/70 border border-slate-700/60 space-y-2 text-xs">
+            <!-- Rellenado dinámicamente con JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pie del Tour: Indicadores de Puntos y Botones -->
+      <div class="px-5 py-3.5 border-t border-slate-800 bg-slate-900/90 flex items-center justify-between gap-3">
+        <!-- Indicador de Diapositivas tipo Barra / Píldoras -->
+        <div class="flex items-center gap-1.5" id="tour-dots-container">
+          <!-- 4 píldoras dinámicas -->
+        </div>
+
+        <!-- Botones de Navegación -->
+        <div class="flex items-center gap-2">
+          <button type="button" id="btn-tour-prev" onclick="prevTourStep()" class="px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition hidden">
+            Anterior
+          </button>
+          <button type="button" id="btn-tour-next" onclick="nextTourStep()" class="px-4 sm:px-5 py-2 text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-xl shadow-md shadow-emerald-500/25 flex items-center gap-1.5 transition active:scale-95">
+            <span id="btn-tour-next-text">Siguiente</span>
+            <i class="fa-solid fa-chevron-right text-[10px]" id="btn-tour-next-icon"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ==================== TOAST NOTIFICATIONS ==================== -->
   <div id="toast-container" class="fixed bottom-5 right-5 left-5 sm:left-auto sm:w-80 z-50 pointer-events-none flex flex-col gap-2"></div>
 
@@ -782,6 +868,157 @@
       'mascotas': ['pienso', 'comida perro', 'comida gato', 'arena gato', 'snacks perro']
     };
 
+    // --- 3.5. DIAPOSITIVAS DEL TOUR GUIADO (TIPO APP STORE / CAROUSEL) ---
+    const TOUR_SLIDES = [
+      {
+        badge: '1. ORGANIZACIÓN INTELIGENTE',
+        title: 'Tu lista organizada automáticamente',
+        question: '¿Escribir o dictar rápido? La IA lo ordena por ti',
+        desc: 'Añade productos en lenguaje natural (ej: "2 kg de tomates, leche sin lactosa, café"). CestAI detecta cantidades, unidades y organiza cada producto en su sección del súper.',
+        img: 'docs/screenshots/02-lista-principal.png',
+        highlights: [
+          { icon: 'fa-brain', title: 'Memoria que aprende', text: 'Si reubicas un producto a otra categoría, la app lo recordará para siempre.' },
+          { icon: 'fa-calculator', title: 'Ajuste rápido numérico', text: 'Toca en la cantidad o usa los botones + y - con teclado numérico nativo.' }
+        ]
+      },
+      {
+        badge: '2. ESCÁNER OCR DE TICKETS',
+        title: 'Cruza tus tickets de compra al instante',
+        question: 'Adiós a tachar manualmente con papel y bolígrafo',
+        desc: 'Haz una foto al ticket del supermercado. La IA Visión multimodal extrae los productos, precios reales pagados, supermercado y fecha con máxima precisión.',
+        img: 'docs/screenshots/03-escaner-ticket-ocr.png',
+        highlights: [
+          { icon: 'fa-barcode', title: 'Cruce Difuso (Fuzzy Matching)', text: 'Empareja abreviaturas ("LECH ENT 1L") con tus productos ("Leche entera").' },
+          { icon: 'fa-chart-line', title: 'Histórico actualizado', text: 'Registra los precios reales para calcular el estimado en próximas compras.' }
+        ]
+      },
+      {
+        badge: '3. COMPARADOR DE PRECIOS',
+        title: 'Ahorra comparando supermercados',
+        question: '¿Dónde te saldrá más barata la compra?',
+        desc: 'Alterna entre Mercadona, Carrefour, Lidl, Dia o crea tus propios súpers. La app estima en tiempo real el coste de tu cesta según los precios registrados.',
+        img: 'docs/screenshots/04-historial-precios.png',
+        highlights: [
+          { icon: 'fa-store', title: 'Selector de Supermercados', text: 'Cambia de súper y comprueba al instante la estimación del importe total.' },
+          { icon: 'fa-tag', title: 'Precios manuales y ofertas', text: 'Toca cualquier precio para corregirlo o registrar una oferta al vuelo.' }
+        ]
+      },
+      {
+        badge: '4. INSTÁLALA EN TU DISPOSITIVO',
+        title: 'Instalación en inicio y privacidad total',
+        question: 'Tu propia app en iPhone, iPad o Android, 100% privada',
+        desc: 'Tus datos nunca salen de tu dispositivo: no requiere registro ni backend. Puedes instalarla en tu pantalla de inicio en segundos:',
+        img: 'docs/screenshots/01-selector-supermercados.png',
+        highlights: [
+          { icon: 'fa-apple', title: 'En iPhone y iPad (Safari)', text: 'Toca el botón "Compartir" de Safari y elige "Añadir a pantalla de inicio".' },
+          { icon: 'fa-android', title: 'En Android (Chrome)', text: 'Toca los tres puntos ⋮ arriba y elige "Instalar app" o "Añadir a inicio".' }
+        ]
+      }
+    ];
+
+    let currentTourStep = 0;
+
+    function openTourModal(step = 0) {
+      currentTourStep = step;
+      renderTourSlide(currentTourStep);
+      const modal = document.getElementById('modal-tour');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeTourModal() {
+      const modal = document.getElementById('modal-tour');
+      if (modal) modal.classList.add('hidden');
+      localStorage.setItem('tucompra_tour_seen', 'true');
+    }
+
+    function renderTourSlide(step) {
+      const slide = TOUR_SLIDES[step];
+      if (!slide) return;
+
+      const counter = document.getElementById('tour-step-counter');
+      if (counter) counter.textContent = `Paso ${step + 1} de ${TOUR_SLIDES.length}`;
+
+      const badge = document.getElementById('tour-slide-badge');
+      if (badge) badge.textContent = slide.badge;
+
+      const title = document.getElementById('tour-slide-title');
+      if (title) title.textContent = slide.title;
+
+      const question = document.getElementById('tour-slide-question');
+      if (question) question.textContent = slide.question;
+
+      const desc = document.getElementById('tour-slide-desc');
+      if (desc) desc.textContent = slide.desc;
+
+      const img = document.getElementById('tour-slide-img');
+      if (img) img.src = slide.img;
+
+      // Render highlights
+      const hContainer = document.getElementById('tour-slide-highlights');
+      if (hContainer) {
+        hContainer.innerHTML = slide.highlights.map(h => `
+          <div class="flex items-start gap-2.5">
+            <div class="w-5 h-5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-[10px] mt-0.5 flex-shrink-0">
+              <i class="fa-solid ${h.icon}"></i>
+            </div>
+            <div>
+              <span class="font-bold text-white text-xs block">${h.title}</span>
+              <span class="text-slate-400 text-[11px] leading-tight block">${h.text}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Render dots
+      const dotsContainer = document.getElementById('tour-dots-container');
+      if (dotsContainer) {
+        dotsContainer.innerHTML = TOUR_SLIDES.map((_, idx) => `
+          <button type="button" onclick="openTourModal(${idx})" class="h-1.5 rounded-full transition-all ${
+            idx === step ? 'w-6 bg-emerald-400' : 'w-2 bg-slate-700 hover:bg-slate-600'
+          }" title="Ir al paso ${idx + 1}"></button>
+        `).join('');
+      }
+
+      // Buttons
+      const btnPrev = document.getElementById('btn-tour-prev');
+      const btnNextText = document.getElementById('btn-tour-next-text');
+      const btnNextIcon = document.getElementById('btn-tour-next-icon');
+
+      if (btnPrev) {
+        if (step === 0) {
+          btnPrev.classList.add('hidden');
+        } else {
+          btnPrev.classList.remove('hidden');
+        }
+      }
+
+      if (btnNextText) {
+        if (step === TOUR_SLIDES.length - 1) {
+          btnNextText.textContent = '¡Empezar a usar CestAI!';
+          if (btnNextIcon) btnNextIcon.className = 'fa-solid fa-sparkles text-[10px]';
+        } else {
+          btnNextText.textContent = 'Siguiente';
+          if (btnNextIcon) btnNextIcon.className = 'fa-solid fa-chevron-right text-[10px]';
+        }
+      }
+    }
+
+    function nextTourStep() {
+      if (currentTourStep < TOUR_SLIDES.length - 1) {
+        currentTourStep++;
+        renderTourSlide(currentTourStep);
+      } else {
+        closeTourModal();
+      }
+    }
+
+    function prevTourStep() {
+      if (currentTourStep > 0) {
+        currentTourStep--;
+        renderTourSlide(currentTourStep);
+      }
+    }
+
     // --- 4. ESTADO DE LA APLICACIÓN ---
     let state = {
       items: [],
@@ -809,6 +1046,18 @@
       updateEstimatedTotal();
       checkApiKeyBadge();
       setupEventListeners();
+
+      // Mostrar tour guiado automáticamente la primera vez en el dispositivo
+      checkFirstTimeTour();
+    }
+
+    function checkFirstTimeTour() {
+      const tourSeen = localStorage.getItem('tucompra_tour_seen');
+      if (!tourSeen) {
+        setTimeout(() => {
+          openTourModal(0);
+        }, 600);
+      }
     }
 
     function loadStateFromLocalStorage() {
@@ -2516,6 +2765,34 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
       document.getElementById('btn-export-data').addEventListener('click', exportDatabase);
       document.getElementById('input-import-data').addEventListener('change', importDatabase);
       document.getElementById('btn-quick-sample').addEventListener('click', loadSampleData);
+
+      // Gestos táctiles de deslizamiento (Swipe) para el Tour en móviles/tablets
+      const tourCard = document.getElementById('tour-slide-card');
+      if (tourCard) {
+        let touchStartX = 0;
+        let touchEndX = 0;
+        tourCard.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        tourCard.addEventListener('touchend', (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          if (touchEndX < touchStartX - 40) {
+            nextTourStep(); // Deslizar hacia la izquierda -> avanzar
+          } else if (touchEndX > touchStartX + 40) {
+            prevTourStep(); // Deslizar hacia la derecha -> retroceder
+          }
+        }, { passive: true });
+      }
+
+      // Navegación con teclado para el Tour
+      window.addEventListener('keydown', (e) => {
+        const modalTour = document.getElementById('modal-tour');
+        if (modalTour && !modalTour.classList.contains('hidden')) {
+          if (e.key === 'ArrowRight') nextTourStep();
+          if (e.key === 'ArrowLeft') prevTourStep();
+          if (e.key === 'Escape') closeTourModal();
+        }
+      });
     }
 
     // Iniciar al cargar el DOM
