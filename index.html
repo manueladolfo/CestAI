@@ -2534,7 +2534,7 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
     }
 
     // --- 15. COPIAS DE SEGURIDAD (IMPORT / EXPORT JSON) ---
-    function exportDatabase() {
+    async function exportDatabase() {
       const backupData = {
         app: 'TuCompra AI',
         version: '1.0',
@@ -2553,16 +2553,57 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
         }
       };
 
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-      const downloadAnchor = document.createElement('a');
+      const jsonStr = JSON.stringify(backupData, null, 2);
       const dateStr = new Date().toISOString().split('T')[0];
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `tucompra-backup-${dateStr}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      const fileName = `tucompra-backup-${dateStr}.json`;
 
-      showToast('Copia de seguridad descargada', 'success');
+      // 1. Compatibilidad Nativa con iPhone (iOS Safari y PWA) y móviles modernos mediante Web Share API
+      if (navigator.share && typeof File !== 'undefined') {
+        try {
+          const file = new File([jsonStr], fileName, { type: 'application/json' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'Copia de seguridad CestAI',
+              text: `Copia de seguridad de TuCompra AI (${dateStr})`
+            });
+            showToast('Copia guardada con éxito', 'success');
+            return;
+          }
+        } catch (err) {
+          // Si el usuario cierra el menú de compartir de iOS, no hacemos nada
+          if (err.name === 'AbortError') return;
+          console.warn('Web Share no disponible, usando descarga Blob directa:', err);
+        }
+      }
+
+      // 2. Método estándar mediante Blob y URL.createObjectURL (para Mac, PC y navegadores de escritorio)
+      try {
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.style.display = 'none';
+        downloadAnchor.href = url;
+        downloadAnchor.download = fileName;
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+
+        setTimeout(() => {
+          document.body.removeChild(downloadAnchor);
+          URL.revokeObjectURL(url);
+        }, 1000);
+
+        showToast('Copia de seguridad descargada', 'success');
+      } catch (err) {
+        console.error('Error al exportar base de datos:', err);
+        // Fallback adicional: copiar el texto JSON al portapapeles
+        try {
+          await navigator.clipboard.writeText(jsonStr);
+          showToast('JSON copiado al portapapeles', 'info');
+        } catch (clipErr) {
+          showToast('No se pudo descargar el archivo', 'error');
+        }
+      }
     }
 
     function importDatabase(event) {
