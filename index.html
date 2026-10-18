@@ -569,7 +569,7 @@
   </div>
 
   <!-- ==================== MODAL DE HISTORIAL Y COMPARADOR DE PRECIOS ==================== -->
-  <div id="modal-history" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+  <div id="modal-history" onclick="if (event.target === this) closeHistoryModal()" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col overflow-hidden">
       
       <!-- Cabecera Modal Historial -->
@@ -580,7 +580,7 @@
           </div>
           <div>
             <h2 class="font-bold text-slate-800 text-sm">Historial & Comparador de Precios</h2>
-            <p class="text-[11px] text-slate-500">Precios registrados por supermercado</p>
+            <p class="text-[11px] text-slate-500">Toca en <b class="text-emerald-700">+ Añadir</b> para devolver productos a tu lista</p>
           </div>
         </div>
         <button id="btn-close-history" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
@@ -1094,6 +1094,7 @@
       pricesHistory: [],
       activeSupermarketId: 'mercadona',
       collapsedCategories: {}, // guarda qué categorías están plegadas
+      collapsedHistoryCategories: {}, // guarda qué categorías del histórico están plegadas
       customCategories: {},    // guarda asociaciones aprendidas { 'nombre_ingrediente': 'cat_id' }
       config: {
         aiProvider: 'gemini',
@@ -1156,6 +1157,13 @@
           state.collapsedCategories = JSON.parse(storedCollapsed);
         }
 
+        const storedCollapsedHist = localStorage.getItem('tucompra_collapsed_history_cats');
+        if (storedCollapsedHist) {
+          state.collapsedHistoryCategories = JSON.parse(storedCollapsedHist);
+        } else {
+          state.collapsedHistoryCategories = {};
+        }
+
         const storedCustomCats = localStorage.getItem('tucompra_custom_categories');
         if (storedCustomCats) {
           state.customCategories = JSON.parse(storedCustomCats);
@@ -1176,6 +1184,7 @@
         localStorage.setItem('tucompra_active_supermarket', state.activeSupermarketId);
         localStorage.setItem('tucompra_config', JSON.stringify(state.config));
         localStorage.setItem('tucompra_collapsed_cats', JSON.stringify(state.collapsedCategories));
+        localStorage.setItem('tucompra_collapsed_history_cats', JSON.stringify(state.collapsedHistoryCategories || {}));
         localStorage.setItem('tucompra_custom_categories', JSON.stringify(state.customCategories || {}));
       } catch (err) {
         console.error('Error al guardar en localStorage:', err);
@@ -2209,9 +2218,11 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
 
         // Registrar precio histórico
         if (ocrItem.unitPrice > 0) {
+          const itemCat = ocrItem.matchedListItem?.category || getLearnedCategory(ocrItem.cleanName) || classifyItemOffline(ocrItem.cleanName);
           state.pricesHistory.push({
             id: 'ph_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
             itemName: ocrItem.cleanName,
+            category: itemCat,
             supermarketId: targetSupermarketId,
             price: ocrItem.unitPrice,
             date: currentOcrData.date,
@@ -2238,62 +2249,269 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
       showToast(`¡Actualizado! ${matchedUpdated} comprados y ${pricesRecorded} precios guardados.`, 'success');
     }
 
-    // --- 14. GESTIÓN DEL HISTORIAL DE PRECIOS ---
+    // --- 14. GESTIÓN DEL HISTORIAL DE PRECIOS Y RECOMPRA CON 1 TOQUE ---
+    function getProductCategory(productName, records = []) {
+      if (!productName) return 'otros';
+
+      // 1. Si algún registro del historial tiene categoría guardada
+      if (Array.isArray(records)) {
+        const withCat = records.find(r => r.category && r.category !== 'otros');
+        if (withCat) return withCat.category;
+      }
+
+      // 2. Si ya existe en la lista de la compra con categoría válida
+      const norm = normalizeText(productName);
+      const inList = state.items.find(i => normalizeText(i.name) === norm);
+      if (inList && inList.category && inList.category !== 'otros') {
+        return inList.category;
+      }
+
+      // 3. Memoria aprendida por el usuario
+      const learned = getLearnedCategory(productName);
+      if (learned) return learned;
+
+      // 4. Heurística offline
+      return classifyItemOffline(productName) || 'otros';
+    }
+
+    function toggleHistoryCategory(catId) {
+      if (!state.collapsedHistoryCategories) {
+        state.collapsedHistoryCategories = {};
+      }
+      state.collapsedHistoryCategories[catId] = !state.collapsedHistoryCategories[catId];
+      saveState();
+      const searchVal = document.getElementById('input-search-history')?.value || '';
+      renderPricesHistory(searchVal);
+    }
+
+    function addHistoryItemToShoppingList(pName) {
+      if (!pName) return;
+      const cleanName = pName.trim();
+      const normName = normalizeText(cleanName);
+
+      // Obtener y recordar su categoría
+      const categoryId = getProductCategory(cleanName);
+
+      // Comprobar si ya existe en la lista de la compra
+      const existing = state.items.find(i => normalizeText(i.name) === normName);
+
+      let toastMsg = '';
+      if (existing) {
+        if (existing.checked) {
+          // Si ya estaba en la lista pero marcado como comprado, lo reactivamos
+          existing.checked = false;
+          existing.quantity = (existing.quantity && existing.quantity > 0) ? existing.quantity : 1;
+          if (!existing.category || existing.category === 'otros') {
+            existing.category = categoryId;
+          }
+          toastMsg = `"${cleanName}" reactivado en tu lista de la compra`;
+        } else {
+          // Si ya está activo en la lista, sumamos +1 a la cantidad
+          existing.quantity = (existing.quantity || 1) + 1;
+          toastMsg = `+1 añadido: ${cleanName} (${existing.quantity} ${existing.unit || 'ud.'})`;
+        }
+      } else {
+        // Si no está, lo creamos nuevo recordando su categoría
+        const newItem = {
+          id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          name: cleanName,
+          category: categoryId,
+          quantity: 1,
+          unit: 'ud.',
+          checked: false,
+          isAiClassified: false,
+          addedAt: new Date().toISOString()
+        };
+        state.items.unshift(newItem);
+
+        // Feedback con precio estimado
+        const estPrice = getEstimatedPriceForItem(cleanName, state.activeSupermarketId);
+        if (estPrice > 0) {
+          toastMsg = `"${cleanName}" añadido a la lista (~${estPrice.toFixed(2)} €)`;
+        } else {
+          toastMsg = `"${cleanName}" añadido a la lista de la compra`;
+        }
+      }
+
+      saveState();
+      renderShoppingList();
+      updateEstimatedTotal();
+
+      // Refrescar el historial para actualizar los indicadores y botones de inmediato
+      const searchVal = document.getElementById('input-search-history')?.value || '';
+      renderPricesHistory(searchVal);
+
+      showToast(toastMsg, 'success');
+    }
+
+    function addHistoryItemFromButton(btn) {
+      if (!btn) return;
+      const pName = btn.getAttribute('data-product');
+      if (pName) {
+        addHistoryItemToShoppingList(pName);
+      }
+    }
+
     function renderPricesHistory(searchTerm = '') {
       const container = document.getElementById('history-items-container');
       const normFilter = normalizeText(searchTerm);
 
-      if (state.pricesHistory.length === 0) {
+      if (!state.pricesHistory || state.pricesHistory.length === 0) {
         container.innerHTML = `
           <div class="py-10 text-center text-slate-400">
-            <i class="fa-solid fa-receipt text-2xl mb-2"></i>
-            <p>Aún no hay precios registrados.</p>
-            <p class="text-[11px] mt-1">Escanea tickets para guardar automáticamente el histórico de precios de cada supermercado.</p>
+            <i class="fa-solid fa-receipt text-3xl mb-2 text-slate-300"></i>
+            <p class="font-semibold text-slate-600">Aún no hay precios registrados</p>
+            <p class="text-[11px] mt-1 text-slate-400 max-w-xs mx-auto">Escanea tickets o pulsa en "Nuevo Precio" para registrar tus productos y comparar precios entre supermercados.</p>
           </div>
         `;
         return;
       }
 
-      // Agrupar por producto y luego por supermercado
-      const grouped = {};
+      // 1. Agrupar registros por producto único
+      const groupedByProduct = {};
       state.pricesHistory.forEach(record => {
         const pName = capitalize(record.itemName);
-        if (!grouped[pName]) grouped[pName] = [];
-        grouped[pName].push(record);
+        if (!groupedByProduct[pName]) groupedByProduct[pName] = [];
+        groupedByProduct[pName].push(record);
       });
 
-      let html = '';
-      const sortedKeys = Object.keys(grouped).sort();
+      // 2. Clasificar cada producto en su categoría
+      const categorizedProducts = {};
+      CATEGORIES.forEach(c => categorizedProducts[c.id] = []);
 
-      sortedKeys.forEach(pName => {
+      Object.entries(groupedByProduct).forEach(([pName, records]) => {
         if (normFilter && !normalizeText(pName).includes(normFilter)) return;
 
-        const records = grouped[pName];
-        
-        // Obtener el precio más reciente por cada supermercado
-        const bySuper = {};
-        records.forEach(r => {
-          if (!bySuper[r.supermarketId] || new Date(r.date) > new Date(bySuper[r.supermarketId].date)) {
-            bySuper[r.supermarketId] = r;
-          }
+        const catId = getProductCategory(pName, records) || 'otros';
+        if (!categorizedProducts[catId]) categorizedProducts[catId] = [];
+        categorizedProducts[catId].push({
+          name: pName,
+          records: records
         });
+      });
+
+      // Ordenar productos alfabéticamente dentro de cada categoría
+      Object.keys(categorizedProducts).forEach(catId => {
+        categorizedProducts[catId].sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+      });
+
+      let totalMatching = 0;
+      let html = '';
+
+      CATEGORIES.forEach(cat => {
+        const productsInCat = categorizedProducts[cat.id] || [];
+        if (productsInCat.length === 0) return; // Ocultar categorías vacías
+
+        totalMatching += productsInCat.length;
+
+        // Si se está buscando texto, auto-expandir; si no, respetar estado guardado
+        const isCollapsed = normFilter 
+          ? false 
+          : !!(state.collapsedHistoryCategories && state.collapsedHistoryCategories[cat.id]);
 
         html += `
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-bold text-slate-800 text-xs">${escapeHtml(pName)}</span>
-              <span class="text-[10px] text-slate-400">${records.length} registros</span>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              ${Object.entries(bySuper).map(([superId, rec]) => {
-                const superName = state.supermarkets.find(s => s.id === superId)?.name || 'General';
+          <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition-all duration-200 mb-3">
+            <!-- Cabecera de Categoría en Histórico (Acordeón) -->
+            <button type="button" onclick="toggleHistoryCategory('${cat.id}')"
+              class="w-full px-3.5 py-2.5 bg-slate-50/90 hover:bg-slate-100 flex items-center justify-between text-left transition select-none">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs border ${cat.color} flex-shrink-0">
+                  <i class="fa-solid ${cat.icon}"></i>
+                </span>
+                <div class="truncate">
+                  <h3 class="text-xs font-bold text-slate-800 truncate">${escapeHtml(cat.name)}</h3>
+                  <span class="text-[10px] text-slate-400 block">${productsInCat.length} ${productsInCat.length === 1 ? 'producto' : 'productos'}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-700">${productsInCat.length}</span>
+                <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}"></i>
+              </div>
+            </button>
+
+            <!-- Lista de Productos dentro de la Categoría -->
+            <div class="${isCollapsed ? 'hidden' : 'block'} p-2.5 space-y-2 bg-slate-50/40">
+              ${productsInCat.map(p => {
+                const pName = p.name;
+                const records = p.records;
+
+                // Obtener el precio más reciente por cada supermercado
+                const bySuper = {};
+                records.forEach(r => {
+                  if (!bySuper[r.supermarketId] || new Date(r.date) > new Date(bySuper[r.supermarketId].date)) {
+                    bySuper[r.supermarketId] = r;
+                  }
+                });
+
+                // Estado en la lista de la compra actual
+                const normP = normalizeText(pName);
+                const inList = state.items.find(i => normalizeText(i.name) === normP);
+
                 return `
-                  <div class="bg-white p-2 rounded-lg border border-slate-100 flex items-center justify-between">
-                    <div>
-                      <span class="text-[10px] text-slate-500 font-medium block truncate">${escapeHtml(superName)}</span>
-                      <span class="text-[9px] text-slate-400">${rec.date}</span>
+                  <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs hover:border-slate-300 transition">
+                    <!-- Fila Superior: Nombre del producto, indicador de lista y Botón 1-Toque -->
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                      <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <span class="font-bold text-slate-800 text-xs">${escapeHtml(pName)}</span>
+                          ${inList ? `
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                              inList.checked 
+                                ? 'bg-slate-100 text-slate-500 line-through' 
+                                : 'bg-emerald-50 text-emerald-800 border border-emerald-200/70'
+                            }">
+                              <i class="fa-solid ${inList.checked ? 'fa-check' : 'fa-cart-shopping'} text-[8px]"></i>
+                              ${inList.checked ? 'Comprado' : `En lista (${inList.quantity} ${inList.unit || 'ud.'})`}
+                            </span>
+                          ` : ''}
+                        </div>
+                        <span class="text-[10px] text-slate-400">${records.length} ${records.length === 1 ? 'registro' : 'registros'} guardados</span>
+                      </div>
+
+                      <!-- Botón 1-Toque Añadir a la lista -->
+                      <button type="button" 
+                        data-product="${escapeHtml(pName)}"
+                        onclick="addHistoryItemFromButton(this)"
+                        title="Añadir de nuevo a la lista de la compra recordando categoría y precio"
+                        class="px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-2xs flex-shrink-0 ${
+                          inList && !inList.checked
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : inList && inList.checked
+                              ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200'
+                              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 hover:border-emerald-300'
+                        }">
+                        <i class="fa-solid ${inList && !inList.checked ? 'fa-plus' : inList && inList.checked ? 'fa-rotate-left' : 'fa-cart-plus'} text-[11px]"></i>
+                        <span>${inList && !inList.checked ? '+1 Cesta' : inList && inList.checked ? 'Reactivar' : '+ Añadir'}</span>
+                      </button>
                     </div>
-                    <span class="font-bold text-xs text-brand-700">${rec.price.toFixed(2)} €</span>
+
+                    <!-- Cuadrícula de Precios por Supermercado -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pt-1.5 border-t border-slate-100">
+                      ${Object.entries(bySuper).map(([superId, rec]) => {
+                        const superName = state.supermarkets.find(s => s.id === superId)?.name || 'General';
+                        const isActiveSuper = superId === state.activeSupermarketId;
+                        return `
+                          <div class="p-1.5 rounded-lg border flex items-center justify-between transition ${
+                            isActiveSuper 
+                              ? 'bg-emerald-50/70 border-emerald-300 text-slate-800 ring-1 ring-emerald-400/40' 
+                              : 'bg-slate-50 border-slate-100 text-slate-700'
+                          }">
+                            <div class="truncate mr-1.5">
+                              <div class="flex items-center gap-1">
+                                <span class="text-[10px] font-semibold truncate ${isActiveSuper ? 'text-emerald-900' : 'text-slate-600'}">
+                                  ${escapeHtml(superName)}
+                                </span>
+                                ${isActiveSuper ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" title="Supermercado activo"></span>' : ''}
+                              </div>
+                              <span class="text-[9px] text-slate-400 block">${rec.date}</span>
+                            </div>
+                            <span class="font-extrabold text-xs ${isActiveSuper ? 'text-emerald-700 font-black' : 'text-slate-800'} whitespace-nowrap">
+                              ${rec.price.toFixed(2)} €
+                            </span>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
                   </div>
                 `;
               }).join('')}
@@ -2302,8 +2520,14 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
         `;
       });
 
-      if (!html) {
-        container.innerHTML = `<p class="text-center py-6 text-slate-400">No se encontraron productos coincidentes.</p>`;
+      if (!html || totalMatching === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-xl mb-2 text-slate-300"></i>
+            <p class="font-semibold text-slate-600">No se encontraron productos</p>
+            <p class="text-[11px] mt-1 text-slate-400">Prueba con otro término de búsqueda o añade un nuevo precio manual.</p>
+          </div>
+        `;
       } else {
         container.innerHTML = html;
       }
@@ -2318,6 +2542,9 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
         items: state.items,
         supermarkets: state.supermarkets,
         pricesHistory: state.pricesHistory,
+        collapsedCategories: state.collapsedCategories,
+        collapsedHistoryCategories: state.collapsedHistoryCategories,
+        customCategories: state.customCategories,
         config: {
           aiProvider: state.config.aiProvider,
           geminiModel: state.config.geminiModel,
@@ -2354,6 +2581,9 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
             if (Array.isArray(imported.items)) state.items = imported.items;
             if (Array.isArray(imported.supermarkets)) state.supermarkets = imported.supermarkets;
             if (Array.isArray(imported.pricesHistory)) state.pricesHistory = imported.pricesHistory;
+            if (imported.collapsedCategories) state.collapsedCategories = imported.collapsedCategories;
+            if (imported.collapsedHistoryCategories) state.collapsedHistoryCategories = imported.collapsedHistoryCategories;
+            if (imported.customCategories) state.customCategories = imported.customCategories;
 
             saveState();
             renderSupermarketSelect();
@@ -2658,9 +2888,11 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
 
       // Guardar en pricesHistory
       const today = new Date().toISOString().split('T')[0];
+      const manualCat = getProductCategory(productName);
       state.pricesHistory.push({
         id: 'ph_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         itemName: productName,
+        category: manualCat,
         supermarketId: selectSuper,
         price: priceVal,
         date: today,
@@ -2766,10 +2998,13 @@ Responde ÚNICAMENTE en JSON con la siguiente estructura:
 
       // Añadir precios de ejemplo
       state.pricesHistory = [
-        { id: 'p1', itemName: 'Leche entera', supermarketId: 'mercadona', price: 1.15, date: '2026-10-10', source: 'manual' },
-        { id: 'p2', itemName: 'Huevos Camperos', supermarketId: 'mercadona', price: 2.30, date: '2026-10-10', source: 'manual' },
-        { id: 'p3', itemName: 'Pechuga de pollo', supermarketId: 'mercadona', price: 3.85, date: '2026-10-10', source: 'manual' },
-        { id: 'p4', itemName: 'Manzanas Golden', supermarketId: 'mercadona', price: 1.89, date: '2026-10-10', source: 'manual' },
+        { id: 'p1', itemName: 'Leche entera', category: 'lacteos-huevos', supermarketId: 'mercadona', price: 1.15, date: '2026-10-10', source: 'manual' },
+        { id: 'p2', itemName: 'Huevos Camperos', category: 'lacteos-huevos', supermarketId: 'mercadona', price: 2.30, date: '2026-10-10', source: 'manual' },
+        { id: 'p3', itemName: 'Pechuga de pollo', category: 'carnes-pescados', supermarketId: 'mercadona', price: 3.85, date: '2026-10-10', source: 'manual' },
+        { id: 'p4', itemName: 'Manzanas Golden', category: 'frutas-verduras', supermarketId: 'mercadona', price: 1.89, date: '2026-10-10', source: 'manual' },
+        { id: 'p5', itemName: 'Leche entera', category: 'lacteos-huevos', supermarketId: 'carrefour', price: 1.19, date: '2026-10-12', source: 'manual' },
+        { id: 'p6', itemName: 'Manzanas Golden', category: 'frutas-verduras', supermarketId: 'lidl', price: 1.79, date: '2026-10-14', source: 'manual' },
+        { id: 'p7', itemName: 'Pan de hogaza', category: 'panaderia', supermarketId: 'mercadona', price: 1.20, date: '2026-10-15', source: 'manual' },
       ];
 
       saveState();

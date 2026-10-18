@@ -37,6 +37,8 @@
   * Cruza automáticamente mediante **Distancia de Levenshtein** y **Similitud de Tokens (Jaccard)** los nombres comerciales del ticket (ej: *"LECH ENT 1L"*) con los productos genéricos de la lista (ej: *"Leche entera"*), marcándolos como comprados y actualizando su precio.
 * **Gestión de Precios e Historial por Supermercado:**
   * Selector dinámico de supermercado activo (Mercadona, Carrefour, Lidl, Dia, Alcampo o personalizados).
+  * **Histórico organizado por categorías:** Visualización estructurada con las mismas categorías oficiales y acordeones plegables que la lista principal.
+  * **Recompra con 1 toque (1-Tap Reorder):** Añade al instante cualquier producto habitual de nuevo a la cesta con solo tocar un botón, recordando su categoría exacta y recuperando el precio estimado sin tener que escribirlo de nuevo.
   * Estimación en tiempo real del coste total de la cesta según los precios históricos o promedio.
   * **Asignación manual de precios:** Posibilidad de tocar sobre el precio de cualquier producto o usar el botón *"Nuevo Precio"* en el comparador para ingresar ofertas en el momento.
 * **Seguridad y Privacidad Absoluta (Zero Backend):**
